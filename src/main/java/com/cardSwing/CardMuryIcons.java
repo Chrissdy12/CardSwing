@@ -99,6 +99,66 @@ public class CardMuryIcons {
             g2.drawRoundRect(1, 4, 14, 8, 2, 2);
             g2.setColor(new Color(107, 114, 128));
             g2.fillPolygon(new int[]{10, 13, 11}, new int[]{7, 7, 10}, 3);
+        } else if (name.equals("CardGrafic")) {
+            g2.setColor(new Color(226, 232, 240));
+            g2.drawLine(2, 2, 2, 14); // Eixo Y
+            g2.drawLine(2, 14, 14, 14); // Eixo X
+            g2.setColor(new Color(59, 130, 246));
+            g2.fillRect(4, 9, 3, 5);
+            g2.fillRect(8, 5, 3, 9);
+            g2.fillRect(12, 2, 3, 12);
+        } else if (name.equals("CardPasswordField")) {
+            g2.setColor(Color.WHITE);
+            g2.fillRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(209, 213, 219));
+            g2.drawRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(107, 114, 128));
+            g2.fillOval(3, 7, 2, 2);
+            g2.fillOval(6, 7, 2, 2);
+            g2.fillOval(9, 7, 2, 2);
+            g2.drawArc(11, 7, 3, 2, 0, 180);
+            g2.drawArc(11, 6, 3, 2, 180, 180);
+        } else if (name.equals("CardTable")) {
+            g2.setColor(Color.WHITE);
+            g2.fillRoundRect(1, 2, 14, 12, 2, 2);
+            g2.setColor(new Color(209, 213, 219));
+            g2.drawRoundRect(1, 2, 14, 12, 2, 2);
+            g2.setColor(new Color(226, 232, 240));
+            g2.fillRect(2, 3, 12, 3);
+            g2.setColor(new Color(241, 245, 249));
+            g2.fillRect(2, 7, 12, 3);
+            g2.fillRect(2, 11, 12, 2);
+        } else if (name.equals("CardTabs")) {
+            g2.setColor(new Color(226, 232, 240));
+            g2.fillRect(2, 4, 12, 8);
+            g2.setColor(Color.WHITE);
+            g2.fillRect(3, 4, 5, 8);
+            g2.setColor(new Color(59, 130, 246));
+            g2.fillRect(3, 11, 5, 1);
+        } else if (name.equals("CardDatePicker") || name.equals("CardDateTimePicker")) {
+            g2.setColor(new Color(226, 232, 240)); // Slate 200 (Borda/Fundo calendário)
+            g2.fillRoundRect(2, 3, 12, 10, 2, 2);
+            g2.setColor(Color.WHITE); // Fundo
+            g2.fillRoundRect(3, 4, 10, 8, 2, 2);
+            g2.setColor(new Color(59, 130, 246)); // Azul Header
+            g2.fillRect(3, 4, 10, 3); // Header azul do calendário
+            
+            // Furos do fichário (Molas)
+            g2.setColor(new Color(15, 23, 42)); // Slate 900
+            g2.drawLine(5, 2, 5, 4);
+            g2.drawLine(10, 2, 10, 4);
+            
+            // Pontinhos vermelhos para representar o dia
+            g2.setColor(new Color(239, 68, 68)); // Red 500
+            g2.fillRect(5, 9, 2, 2);
+            
+            if (name.equals("CardDateTimePicker")) {
+                // Adiciona um reloginho azul claro no canto pra diferenciar
+                g2.setColor(new Color(14, 165, 233)); // Sky 500
+                g2.fillOval(9, 8, 5, 5);
+                g2.setColor(Color.WHITE);
+                g2.fillRect(11, 9, 1, 2); // Ponteiros
+            }
         } else {
             // Default genérico
             g2.setColor(Color.GRAY);

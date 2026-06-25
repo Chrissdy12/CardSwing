@@ -10,11 +10,9 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Campo de texto estilizado para Card — cantos arredondados, borda customizada e efeito de foco.
- *
- * <p><b>PALETTE:</b> Arraste para dentro de um CardPanel.</p>
+ * Campo de senha estilizado para Card — com ícone de olho para mostrar/ocultar senha.
  */
-public class CardTextField extends JFormattedTextField implements Serializable {
+public class CardPasswordField extends JPasswordField implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
@@ -24,15 +22,24 @@ public class CardTextField extends JFormattedTextField implements Serializable {
     private Color hoverColor = new Color(156, 163, 175); // Gray 400
     
     private boolean isHovered = false;
+    private boolean showPassword = false;
+    private char defaultEchoChar;
+    
+    private Rectangle eyeBounds = new Rectangle(0, 0, 0, 0);
 
     private String placeholder = "";
 
-    public CardTextField() {
+    public CardPasswordField() {
         this("");
     }
 
-    public CardTextField(String text) {
+    public CardPasswordField(String text) {
         super(text);
+        defaultEchoChar = getEchoChar();
+        if (defaultEchoChar == (char) 0) {
+            defaultEchoChar = '•'; // Garante um fallback
+            setEchoChar(defaultEchoChar);
+        }
         setup();
     }
 
@@ -42,7 +49,7 @@ public class CardTextField extends JFormattedTextField implements Serializable {
         setBackground(Color.WHITE);
         setCaretColor(focusColor);
         setOpaque(false);
-        setBorder(new EmptyBorder(8, 12, 8, 12));
+        setBorder(new EmptyBorder(8, 12, 8, 36)); // Espaço extra para o ícone
         
         addMouseListener(new MouseAdapter() {
             @Override
@@ -54,29 +61,31 @@ public class CardTextField extends JFormattedTextField implements Serializable {
             @Override
             public void mouseExited(MouseEvent e) {
                 isHovered = false;
+                setCursor(new Cursor(Cursor.TEXT_CURSOR));
                 if (!hasFocus()) repaint();
+            }
+
+            @Override
+            public void mousePressed(MouseEvent e) {
+                if (eyeBounds.contains(e.getPoint())) {
+                    showPassword = !showPassword;
+                    setEchoChar(showPassword ? (char) 0 : defaultEchoChar);
+                    repaint();
+                }
             }
         });
         
-        // Garante que o Caret (cursor piscante) não suma em fundos transparentes/arredondados
-        setCaret(new javax.swing.text.DefaultCaret() {
+        addMouseMotionListener(new MouseAdapter() {
             @Override
-            public void paint(Graphics g) {
-                g.setColor(getCaretColor());
-                super.paint(g);
-            }
-            @Override
-            protected synchronized void damage(Rectangle r) {
-                if (r == null) return;
-                x = r.x;
-                y = r.y;
-                width = r.width;
-                height = r.height;
-                repaint(); // Repaint total do componente para evitar rastros ou sumiços
+            public void mouseMoved(MouseEvent e) {
+                if (eyeBounds.contains(e.getPoint())) {
+                    setCursor(new Cursor(Cursor.HAND_CURSOR));
+                } else {
+                    setCursor(new Cursor(Cursor.TEXT_CURSOR));
+                }
             }
         });
-        getCaret().setBlinkRate(500);
-
+        
         addFocusListener(new FocusAdapter() {
             @Override
             public void focusGained(FocusEvent e) {
@@ -86,16 +95,6 @@ public class CardTextField extends JFormattedTextField implements Serializable {
             @Override
             public void focusLost(FocusEvent e) {
                 repaint();
-            }
-        });
-        
-        addKeyListener(new java.awt.event.KeyAdapter() {
-            @Override
-            public void keyPressed(java.awt.event.KeyEvent e) {
-                if (e.getKeyCode() == java.awt.event.KeyEvent.VK_ENTER) {
-                    transferFocus();
-                    e.consume(); // Evita que o evento de Enter seja processado duplicado
-                }
             }
         });
     }
@@ -112,7 +111,7 @@ public class CardTextField extends JFormattedTextField implements Serializable {
         super.paintComponent(g);
         
         // Placeholder
-        if (getText().isEmpty() && placeholder != null && !placeholder.isEmpty() && !hasFocus()) {
+        if (new String(getPassword()).isEmpty() && placeholder != null && !placeholder.isEmpty() && !hasFocus()) {
             g2.setColor(new Color(156, 163, 175)); // Gray 400
             g2.setFont(getFont());
             FontMetrics fm = g2.getFontMetrics();
@@ -120,7 +119,41 @@ public class CardTextField extends JFormattedTextField implements Serializable {
             g2.drawString(placeholder, getInsets().left, y);
         }
         
+        // Desenha o olhinho
+        drawEye(g2);
+        
         g2.dispose();
+    }
+    
+    private void drawEye(Graphics2D g2) {
+        int iconSize = 18;
+        int x = getWidth() - iconSize - 12;
+        int y = (getHeight() - iconSize) / 2;
+        
+        eyeBounds.setBounds(x - 5, y - 5, iconSize + 10, iconSize + 10);
+        
+        g2.setColor(isHovered ? hoverColor : borderColor);
+        g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        
+        // Olho usando curva quadrática para um formato amendoado perfeito
+        java.awt.geom.QuadCurve2D topCurve = new java.awt.geom.QuadCurve2D.Float(x, y + iconSize/2f, x + iconSize/2f, y + 2, x + iconSize, y + iconSize/2f);
+        java.awt.geom.QuadCurve2D bottomCurve = new java.awt.geom.QuadCurve2D.Float(x, y + iconSize/2f, x + iconSize/2f, y + iconSize - 2, x + iconSize, y + iconSize/2f);
+        
+        g2.draw(topCurve);
+        g2.draw(bottomCurve);
+        
+        // Íris do olho
+        int irisSize = 6;
+        int ix = x + (iconSize - irisSize) / 2;
+        int iy = y + (iconSize - irisSize) / 2;
+        
+        if (showPassword) {
+            g2.fillOval(ix, iy, irisSize, irisSize);
+        } else {
+            g2.drawOval(ix, iy, irisSize, irisSize);
+            // Traço diagonal cortando (senha oculta)
+            g2.drawLine(x + 1, y + iconSize - 1, x + iconSize - 1, y + 1);
+        }
     }
 
     @Override
@@ -165,11 +198,5 @@ public class CardTextField extends JFormattedTextField implements Serializable {
     public void setPlaceholder(String placeholder) { 
         this.placeholder = placeholder; 
         repaint(); 
-    }
-    
-    public Color getHoverColor() { return hoverColor; }
-    public void setHoverColor(Color hoverColor) {
-        this.hoverColor = hoverColor;
-        repaint();
     }
 }

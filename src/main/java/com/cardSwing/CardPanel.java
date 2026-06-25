@@ -119,42 +119,15 @@ public class CardPanel extends JPanel implements Serializable {
         repaint();
     }
 
-    /**
-     * Calcula o tamanho preferido com largura fixa e altura dinâmica
-     * baseada no conteúdo (filhos do BoxLayout).
-     */
     @Override
     public Dimension getPreferredSize() {
-        int sh = shadowEnabled ? 5 : 0;
         if (collapsed) {
             boolean hasTitle = (title != null && !title.trim().isEmpty());
             int headerHeight = hasTitle ? 38 : 5;
-            return new Dimension(cardWidth + sh, headerHeight + sh);
+            int sh = shadowEnabled ? 5 : 0;
+            return new Dimension(super.getPreferredSize().width, headerHeight + sh);
         }
-
-        LayoutManager layout = getLayout();
-        int h = 50; // altura padrão caso não seja possível calcular
-        if (layout != null) {
-            Dimension layoutPref = layout.preferredLayoutSize(this);
-            if (layoutPref != null) {
-                h = layoutPref.height;
-            }
-        } else {
-            Dimension sup = super.getPreferredSize();
-            if (sup != null) {
-                h = sup.height;
-            }
-        }
-
-        // A altura (h) já inclui a margem inferior que configuramos no updatePadding, 
-        // e essa margem agora já engloba o espaço da sombra (+ sh). 
-        // Portanto, não precisamos somar 'sh' novamente aqui na altura.
-        return new Dimension(cardWidth + sh, h);
-    }
-
-    @Override
-    public Dimension getMinimumSize() {
-        return new Dimension(200, 80);
+        return super.getPreferredSize();
     }
 
     @Override
@@ -170,7 +143,8 @@ public class CardPanel extends JPanel implements Serializable {
         // === SOMBRA ===
         if (shadowEnabled) {
             if (hover && hoverEnabled) {
-                // Efeito super moderno: sombra "Smooth" com leve deslocamento para baixo (elevação real)
+                // Efeito super moderno: sombra "Smooth" com leve deslocamento para baixo
+                // (elevação real)
                 for (int i = 5; i >= 1; i--) {
                     g2.setColor(new Color(0, 0, 0, 10 + (5 - i) * 5));
                     g2.fill(new RoundRectangle2D.Float(i - 1f, i, w, h, r + 2, r + 2));
@@ -203,7 +177,8 @@ public class CardPanel extends JPanel implements Serializable {
             int headerHeight = hasTitle ? 38 : 5;
 
             Shape oldClip = g2.getClip();
-            // Usamos um clip retangular (que não causa serrilhado) e preenchemos a forma arredondada!
+            // Usamos um clip retangular (que não causa serrilhado) e preenchemos a forma
+            // arredondada!
             g2.clipRect(0, 0, w, headerHeight);
 
             g2.setColor(themeColor);
@@ -229,7 +204,8 @@ public class CardPanel extends JPanel implements Serializable {
         }
 
         // === BORDA HOVER ===
-        // Desenhada DEPOIS do Theme Bar. Coordenadas e Stroke ajustados para ABRAÇAR perfeitamente
+        // Desenhada DEPOIS do Theme Bar. Coordenadas e Stroke ajustados para ABRAÇAR
+        // perfeitamente
         // o card, sem deixar o fundo azul vazar para fora!
         if (hover && hoverEnabled && hoverBorderColor != null) {
             g2.setColor(hoverBorderColor);

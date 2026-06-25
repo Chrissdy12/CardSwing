@@ -54,8 +54,10 @@ public class CardButton extends JButton implements Serializable {
     }
 
     private void setup() {
+        setUI(new javax.swing.plaf.basic.BasicButtonUI());
         setFont(new Font("Segoe UI", Font.BOLD, 12));
         setForeground(textColor);
+        setOpaque(false);
         setContentAreaFilled(false);
         setFocusPainted(false);
         setBorderPainted(false);

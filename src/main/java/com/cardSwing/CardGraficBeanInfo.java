@@ -6,18 +6,18 @@ import java.beans.SimpleBeanInfo;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CardTextFieldBeanInfo extends SimpleBeanInfo {
+public class CardGraficBeanInfo extends SimpleBeanInfo {
 
     @Override
     public BeanDescriptor getBeanDescriptor() {
-        BeanDescriptor bd = new BeanDescriptor(CardTextField.class);
-        bd.setDisplayName("CardTextField");
+        BeanDescriptor bd = new BeanDescriptor(CardGrafic.class);
+        bd.setDisplayName("CardGrafic");
         return bd;
     }
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardTextField");
+        return CardMuryIcons.getIconFor("CardGrafic"); // Fallback to a default if missing
     }
 
     @Override
@@ -25,12 +25,15 @@ public class CardTextFieldBeanInfo extends SimpleBeanInfo {
         try {
             List<PropertyDescriptor> props = new ArrayList<>();
             String[] customProps = {
-                "text", "font", "foreground", "background", "radius", "borderColor", "focusColor", "placeholder"
+                "chartType", "values", "labels", "colors", "chartColor", "gridColor", "textColor", 
+                "showGrid", "showLabels", "title", "titlePosition", "titleColor",
+                "font", "foreground", "background",
+                "themeColor", "shadowEnabled", "hoverEnabled"
             };
 
             for (String propName : customProps) {
                 try {
-                    PropertyDescriptor pd = new PropertyDescriptor(propName, CardTextField.class);
+                    PropertyDescriptor pd = new PropertyDescriptor(propName, CardGrafic.class);
                     pd.setPreferred(true);
                     pd.setValue("category", "CardMury Configs");
                     props.add(pd);

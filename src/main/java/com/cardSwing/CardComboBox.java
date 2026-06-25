@@ -118,8 +118,8 @@ public class CardComboBox<E> extends JComboBox<E> implements Serializable {
                     Graphics2D g2 = (Graphics2D) g.create();
                     g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                     
-                    int size = 8;
-                    int x = (getWidth() - size) / 2;
+                    int size = 10;
+                    int x = (getWidth() - size) / 2 + 2;
                     int y = (getHeight() - (size / 2)) / 2;
                     
                     g2.setColor(new Color(107, 114, 128)); // Gray 500
@@ -129,13 +129,20 @@ public class CardComboBox<E> extends JComboBox<E> implements Serializable {
                         g2.setColor(new Color(75, 85, 99)); // Gray 600
                     }
 
-                    int[] xPoints = {x, x + size, x + size / 2};
-                    int[] yPoints = {y, y, y + size / 2};
-                    g2.fillPolygon(xPoints, yPoints, 3);
+                    // Chevron (Seta pra baixo moderna)
+                    g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(x, y, x + size / 2, y + size / 2);
+                    g2.drawLine(x + size / 2, y + size / 2, x + size, y);
+                    
+                    // Separador vertical sutil
+                    g2.setColor(borderColor);
+                    g2.setStroke(new BasicStroke(1f));
+                    g2.drawLine(0, 8, 0, getHeight() - 8);
                     
                     g2.dispose();
                 }
             };
+            button.setPreferredSize(new Dimension(34, 0));
             button.setBorder(BorderFactory.createEmptyBorder());
             button.setContentAreaFilled(false);
             button.setFocusPainted(false);
