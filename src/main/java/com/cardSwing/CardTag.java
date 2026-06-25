@@ -62,6 +62,14 @@ public class CardTag extends JPanel implements Serializable {
         add(label);
     }
 
+    @Override
+    public void setFont(Font font) {
+        super.setFont(font);
+        if (label != null) {
+            label.setFont(font);
+        }
+    }
+
     // === PROPRIEDADES ===
 
     /** Texto da tag. */
@@ -69,7 +77,7 @@ public class CardTag extends JPanel implements Serializable {
     public void setText(String text) {
         String old = this.text;
         this.text = text != null ? text : "";
-        label.setText(this.text);
+        if (label != null) label.setText(this.text);
         firePropertyChange("text", old, this.text);
     }
 
@@ -87,7 +95,7 @@ public class CardTag extends JPanel implements Serializable {
     public void setTagTextColor(Color tagTextColor) {
         Color old = this.tagTextColor;
         this.tagTextColor = tagTextColor;
-        label.setForeground(tagTextColor);
+        if (label != null) label.setForeground(tagTextColor);
         firePropertyChange("tagTextColor", old, tagTextColor);
     }
 
@@ -97,6 +105,21 @@ public class CardTag extends JPanel implements Serializable {
         int old = this.tagRadius;
         this.tagRadius = Math.max(0, tagRadius);
         firePropertyChange("tagRadius", old, this.tagRadius);
+        repaint();
+    }
+
+    public int getFontSize() { 
+        return label != null && label.getFont() != null ? label.getFont().getSize() : 11; 
+    }
+    public void setFontSize(int fontSize) {
+        int old = getFontSize();
+        int newSize = Math.max(8, fontSize);
+        if (label != null && label.getFont() != null) {
+            Font f = label.getFont();
+            label.setFont(new Font(f.getFamily(), f.getStyle(), newSize));
+        }
+        firePropertyChange("fontSize", old, newSize);
+        revalidate();
         repaint();
     }
 }

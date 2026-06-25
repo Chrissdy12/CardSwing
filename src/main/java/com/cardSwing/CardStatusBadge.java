@@ -25,6 +25,7 @@ public class CardStatusBadge extends JPanel implements Serializable {
     private String value = "0";
     private Color valueColor = new Color(59, 130, 246);
     private boolean showDot = true;
+    private int fontSize = 12;
 
     private final JLabel labelPart;
     private final JLabel valuePart;
@@ -52,21 +53,23 @@ public class CardStatusBadge extends JPanel implements Serializable {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(CardStatusBadge.this.valueColor);
-                g2.fillOval(1, 3, 8, 8);
+                int dotSize = getDotSize();
+                int y = (getHeight() - dotSize) / 2;
+                g2.fillOval(1, Math.max(0, y), dotSize, dotSize);
                 g2.dispose();
             }
         };
         dotPanel.setOpaque(false);
-        dotPanel.setPreferredSize(new Dimension(11, 14));
+        updateDotSize();
 
         // Rótulo
         labelPart = new JLabel(label + ":");
-        labelPart.setFont(new Font("Segoe UI", Font.PLAIN, 12));
+        labelPart.setFont(new Font("Segoe UI", Font.PLAIN, fontSize));
         labelPart.setForeground(new Color(100, 116, 139));
 
         // Valor
         valuePart = new JLabel(value);
-        valuePart.setFont(new Font("Segoe UI", Font.BOLD, 12));
+        valuePart.setFont(new Font("Segoe UI", Font.BOLD, fontSize));
         valuePart.setForeground(valueColor);
 
         if (showDot) add(dotPanel);
@@ -84,6 +87,42 @@ public class CardStatusBadge extends JPanel implements Serializable {
         add(valuePart);
         revalidate();
         repaint();
+    }
+
+    private int getDotSize() {
+        return Math.max(4, (int) (fontSize * 0.66));
+    }
+
+    private void updateDotSize() {
+        if (dotPanel != null) {
+            int dotSize = getDotSize();
+            dotPanel.setPreferredSize(new Dimension(dotSize + 4, fontSize + 4));
+            dotPanel.revalidate();
+            dotPanel.repaint();
+        }
+    }
+
+    @Override
+    public void setFont(Font font) {
+        super.setFont(font);
+        if (font != null) {
+            this.fontSize = font.getSize();
+            if (labelPart != null) {
+                labelPart.setFont(new Font(font.getFamily(), Font.PLAIN, this.fontSize));
+            }
+            if (valuePart != null) {
+                valuePart.setFont(new Font(font.getFamily(), Font.BOLD, this.fontSize));
+            }
+            updateDotSize();
+        }
+    }
+
+    @Override
+    public void setForeground(Color fg) {
+        super.setForeground(fg);
+        if (labelPart != null) {
+            labelPart.setForeground(fg);
+        }
     }
 
     // === PROPRIEDADES ===
@@ -122,5 +161,18 @@ public class CardStatusBadge extends JPanel implements Serializable {
         this.showDot = showDot;
         firePropertyChange("showDot", old, showDot);
         rebuild();
+    }
+
+    public int getFontSize() { return fontSize; }
+    public void setFontSize(int fontSize) {
+        int old = this.fontSize;
+        this.fontSize = Math.max(8, fontSize);
+        Font currentFont = getFont();
+        if (currentFont != null) {
+            setFont(new Font(currentFont.getFamily(), currentFont.getStyle(), this.fontSize));
+        } else {
+            setFont(new Font("Segoe UI", Font.PLAIN, this.fontSize));
+        }
+        firePropertyChange("fontSize", old, this.fontSize);
     }
 }

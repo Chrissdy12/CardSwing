@@ -30,6 +30,22 @@ public class CardText extends JLabel implements Serializable {
         setMaximumSize(new Dimension(Integer.MAX_VALUE, 100));
     }
 
+    @Override
+    public void setFont(Font font) {
+        super.setFont(font);
+        if (font != null && font.getSize() != this.fontSize) {
+            this.fontSize = font.getSize();
+        }
+    }
+
+    @Override
+    public void setForeground(Color fg) {
+        super.setForeground(fg);
+        if (this.textColor != fg && fg != null) {
+            this.textColor = fg;
+        }
+    }
+
     public Color getTextColor() { return textColor; }
     public void setTextColor(Color textColor) {
         Color old = this.textColor;
@@ -42,7 +58,12 @@ public class CardText extends JLabel implements Serializable {
     public void setFontSize(int fontSize) {
         int old = this.fontSize;
         this.fontSize = Math.max(8, fontSize);
-        setFont(new Font("Segoe UI", Font.PLAIN, this.fontSize));
+        Font currentFont = getFont();
+        if (currentFont != null) {
+            setFont(new Font(currentFont.getFamily(), currentFont.getStyle(), this.fontSize));
+        } else {
+            setFont(new Font("Segoe UI", Font.PLAIN, this.fontSize));
+        }
         firePropertyChange("fontSize", old, this.fontSize);
     }
 }
