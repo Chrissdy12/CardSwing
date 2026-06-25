@@ -720,6 +720,30 @@ public class CardGrafic extends JPanel implements Serializable {
     }
 
     /**
+     * Permite popular o gráfico via código passando uma lista de objetos, agrupando-os por uma chave e contando as ocorrências.
+     * Ideal para contar a repetição de itens (como quantidade por alíquota).
+     * 
+     * @param <T> O tipo do objeto da sua lista
+     * @param items Lista de objetos
+     * @param groupExtractor Função para extrair a chave de agrupamento (que também será o texto/label)
+     */
+    public <T> void setGroupedItemsAndCount(List<T> items, java.util.function.Function<T, String> groupExtractor) {
+        if (items == null) return;
+        
+        java.util.Map<String, Long> contagem = items.stream()
+            .collect(java.util.stream.Collectors.groupingBy(
+                groupExtractor,
+                java.util.stream.Collectors.counting()
+            ));
+
+        setItems(
+            new java.util.ArrayList<>(contagem.entrySet()),
+            entry -> entry.getKey(),
+            entry -> entry.getValue()
+        );
+    }
+
+    /**
      * Permite popular o gráfico via código passando uma lista de objetos e funções Lambda para extrair os dados.
      * 
      * @param <T> O tipo do objeto da sua lista

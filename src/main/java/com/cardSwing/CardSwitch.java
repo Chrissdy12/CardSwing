@@ -17,6 +17,7 @@ public class CardSwitch extends JCheckBox {
     
     private int knobX = 2;
     private final Timer animTimer;
+    private boolean editable = true;
 
     public CardSwitch(String text) {
         super(text);
@@ -94,5 +95,46 @@ public class CardSwitch extends JCheckBox {
     public void setTrackOffColor(Color trackOffColor) { 
         this.trackOffColor = trackOffColor; 
         repaint(); 
+    }
+
+    public boolean isEditable() { return editable; }
+    
+    public void setEditable(boolean editable) {
+        boolean old = this.editable;
+        this.editable = editable;
+        firePropertyChange("editable", old, editable);
+    }
+    
+    @Override
+    public void setSelected(boolean b) {
+        super.setSelected(b);
+        if (animTimer != null && !animTimer.isRunning()) {
+            animTimer.start();
+        }
+    }
+
+    @Override
+    protected void processMouseEvent(java.awt.event.MouseEvent e) {
+        if (!editable) {
+            int id = e.getID();
+            if (id == java.awt.event.MouseEvent.MOUSE_PRESSED || 
+                id == java.awt.event.MouseEvent.MOUSE_RELEASED || 
+                id == java.awt.event.MouseEvent.MOUSE_CLICKED) {
+                e.consume();
+                return;
+            }
+        }
+        super.processMouseEvent(e);
+    }
+
+    @Override
+    protected void processKeyEvent(java.awt.event.KeyEvent e) {
+        if (!editable) {
+            if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                e.consume();
+                return;
+            }
+        }
+        super.processKeyEvent(e);
     }
 }

@@ -21,6 +21,7 @@ public class CardCheck extends JCheckBox implements Serializable {
     private static final long serialVersionUID = 1L;
 
     private Color checkColor = new Color(59, 130, 246);
+    private boolean editable = true;
 
     public CardCheck() {
         this("Opção");
@@ -49,6 +50,39 @@ public class CardCheck extends JCheckBox implements Serializable {
         this.checkColor = checkColor;
         firePropertyChange("checkColor", old, checkColor);
         repaint();
+    }
+
+    public boolean isEditable() { return editable; }
+    
+    public void setEditable(boolean editable) {
+        boolean old = this.editable;
+        this.editable = editable;
+        firePropertyChange("editable", old, editable);
+    }
+
+    @Override
+    protected void processMouseEvent(java.awt.event.MouseEvent e) {
+        if (!editable) {
+            int id = e.getID();
+            if (id == java.awt.event.MouseEvent.MOUSE_PRESSED || 
+                id == java.awt.event.MouseEvent.MOUSE_RELEASED || 
+                id == java.awt.event.MouseEvent.MOUSE_CLICKED) {
+                e.consume();
+                return;
+            }
+        }
+        super.processMouseEvent(e);
+    }
+
+    @Override
+    protected void processKeyEvent(java.awt.event.KeyEvent e) {
+        if (!editable) {
+            if (e.getKeyCode() == java.awt.event.KeyEvent.VK_SPACE) {
+                e.consume();
+                return;
+            }
+        }
+        super.processKeyEvent(e);
     }
 
     @Override

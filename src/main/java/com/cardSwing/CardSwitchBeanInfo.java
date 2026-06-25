@@ -26,7 +26,7 @@ public class CardSwitchBeanInfo extends SimpleBeanInfo {
         try {
             List<PropertyDescriptor> props = new ArrayList<>();
                         String[] customProps = {
-                "text", "title", "titleIcon", "font", "foreground", "background", "icon", "selected", 
+                "text", "title", "titleIcon", "font", "foreground", "background", "icon", "selected", "editable",
                 "progress", "currentValue", "totalValue", "showPercentage",
                 "barColor", "trackColor", "showLabel", "barHeight", 
                 "lineColor", "thickness", "verticalMargin", "verticalPadding", 

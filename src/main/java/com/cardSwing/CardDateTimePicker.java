@@ -20,29 +20,30 @@ public class CardDateTimePicker extends CardDatePicker {
 
     private LocalTime selectedTime;
     private DateTimeFormatter dateTimeFormatter;
-    
+
     private CardComboBox<String> comboHour;
     private CardComboBox<String> comboMinute;
 
     public CardDateTimePicker() {
         super();
         setPlaceholder("");
-        
+
         try {
             MaskFormatter mf = new MaskFormatter("##/##/#### ##:##");
             mf.setPlaceholderCharacter('_');
             setFormatterFactory(new DefaultFormatterFactory(mf));
             setValue(null);
-        } catch (Exception ex) {}
+        } catch (Exception ex) {
+        }
 
         dateTimeFormatter = DateTimeFormatter.ofPattern("dd/MM/yyyy HH:mm", new Locale("pt", "BR"));
         selectedTime = LocalTime.of(0, 0);
-        
+
         // Os listeners do pai (CardDatePicker) chamarão parseText() automaticamente!
-        
+
         updateTextField();
     }
-    
+
     @Override
     protected void parseText() {
         try {
@@ -62,7 +63,8 @@ public class CardDateTimePicker extends CardDatePicker {
         } catch (Exception ex) {
             setValidState(false);
         }
-        // Quando a edição ocorre livremente, definimos o valor interno no JFormattedTextField 
+        // Quando a edição ocorre livremente, definimos o valor interno no
+        // JFormattedTextField
         // chamando updateTextField (que usa setValue)
         updateTextField();
     }
@@ -75,22 +77,22 @@ public class CardDateTimePicker extends CardDatePicker {
         if (selectedTime == null) {
             selectedTime = LocalTime.of(0, 0);
         }
-        
+
         JPanel timePanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 5, 10));
         timePanel.setOpaque(false);
         timePanel.setBorder(BorderFactory.createMatteBorder(1, 0, 0, 0, new Color(226, 232, 240))); // Slate 200
-        
+
         JLabel lblTime = new JLabel("Horário:");
         lblTime.setFont(new Font("Segoe UI", Font.BOLD, 12));
         lblTime.setForeground(new Color(100, 116, 139)); // Slate 500
-        
+
         // Controles de Hora
         CardButton btnPrevHour = createMiniButton("<");
         lblHour = new JLabel(String.format("%02d", selectedTime.getHour()), SwingConstants.CENTER);
         lblHour.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblHour.setPreferredSize(new Dimension(24, 24));
         CardButton btnNextHour = createMiniButton(">");
-        
+
         btnPrevHour.addActionListener(e -> {
             selectedTime = selectedTime.minusHours(1);
             updateTimeLabels();
@@ -99,18 +101,18 @@ public class CardDateTimePicker extends CardDatePicker {
             selectedTime = selectedTime.plusHours(1);
             updateTimeLabels();
         });
-        
+
         JLabel lblColon = new JLabel(":");
         lblColon.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblColon.setForeground(new Color(51, 65, 85));
-        
+
         // Controles de Minuto
         CardButton btnPrevMin = createMiniButton("<");
         lblMinute = new JLabel(String.format("%02d", selectedTime.getMinute()), SwingConstants.CENTER);
         lblMinute.setFont(new Font("Segoe UI", Font.BOLD, 14));
         lblMinute.setPreferredSize(new Dimension(24, 24));
         CardButton btnNextMin = createMiniButton(">");
-        
+
         btnPrevMin.addActionListener(e -> {
             selectedTime = selectedTime.minusMinutes(1);
             updateTimeLabels();
@@ -119,20 +121,20 @@ public class CardDateTimePicker extends CardDatePicker {
             selectedTime = selectedTime.plusMinutes(1);
             updateTimeLabels();
         });
-        
+
         timePanel.add(lblTime);
         timePanel.add(Box.createHorizontalStrut(5));
         timePanel.add(btnPrevHour);
         timePanel.add(lblHour);
         timePanel.add(btnNextHour);
-        
+
         timePanel.add(lblColon);
-        
+
         timePanel.add(btnPrevMin);
         timePanel.add(lblMinute);
         timePanel.add(btnNextMin);
         timePanel.add(Box.createHorizontalStrut(5));
-        
+
         // Botão OK
         CardButton btnOk = new CardButton();
         btnOk.setText("OK");
@@ -148,10 +150,10 @@ public class CardDateTimePicker extends CardDatePicker {
             }
         });
         timePanel.add(btnOk);
-        
+
         mainPanel.add(timePanel, BorderLayout.SOUTH);
     }
-    
+
     private CardButton createMiniButton(String text) {
         CardButton btn = new CardButton();
         btn.setText(text);
@@ -161,7 +163,7 @@ public class CardDateTimePicker extends CardDatePicker {
         btn.setFont(new Font("Segoe UI", Font.BOLD, 10));
         return btn;
     }
-    
+
     private void updateTimeLabels() {
         if (lblHour != null && lblMinute != null) {
             lblHour.setText(String.format("%02d", selectedTime.getHour()));
@@ -172,7 +174,8 @@ public class CardDateTimePicker extends CardDatePicker {
 
     @Override
     protected void onDayClicked(LocalDate date) {
-        // Apenas atualiza a data e repinta o calendário, NÃO FECHA o popup (para dar tempo de escolher a hora)
+        // Apenas atualiza a data e repinta o calendário, NÃO FECHA o popup (para dar
+        // tempo de escolher a hora)
         this.selectedDate = date;
         updateTextField();
         updateCalendar();
@@ -189,7 +192,8 @@ public class CardDateTimePicker extends CardDatePicker {
     }
 
     public LocalDateTime getLocalDateTime() {
-        if (selectedDate == null) return null;
+        if (selectedDate == null)
+            return null;
         return LocalDateTime.of(selectedDate, selectedTime);
     }
 
@@ -207,18 +211,19 @@ public class CardDateTimePicker extends CardDatePicker {
         }
         updateTextField();
     }
-    
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
-        // Opcional: adicionar um ícone de relógio no canto para diferenciar do DatePicker normal
+        // Opcional: adicionar um ícone de relógio no canto para diferenciar do
+        // DatePicker normal
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(new Color(59, 130, 246)); // Azulzinho sutil no cantinho do ícone
-        
+
         int iconX = getWidth() - 20;
         int iconY = (getHeight() - 16) / 2 + 10;
-        
+
         g2.fillOval(iconX, iconY, 6, 6);
         g2.dispose();
     }
