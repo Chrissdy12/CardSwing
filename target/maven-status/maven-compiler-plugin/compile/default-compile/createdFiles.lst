@@ -17,6 +17,7 @@ com\cardSwing\CardTag.class
 com\cardSwing\CardCheck.class
 com\cardSwing\CardSeparatorBeanInfo.class
 com\cardSwing\CardAvatar.class
+com\cardSwing\CardButton$1.class
 com\cardSwing\CardTextField$2.class
 com\cardSwing\CardListPanel$1.class
 com\cardSwing\CardComboBox$CustomComboBoxUI$2.class

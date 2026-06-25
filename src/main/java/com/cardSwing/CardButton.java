@@ -25,6 +25,12 @@ public class CardButton extends JButton implements Serializable {
     private Color textColor = Color.WHITE;
     private int buttonRadius = 8;
 
+    // Efeitos Modernos
+    private Point clickPoint;
+    private float rippleRadius = 0f;
+    private float rippleAlpha = 0f;
+    private Timer rippleTimer;
+
     public CardButton() {
         this("Botão");
     }
@@ -56,6 +62,27 @@ public class CardButton extends JButton implements Serializable {
         setCursor(new Cursor(Cursor.HAND_CURSOR));
         setAlignmentX(Component.LEFT_ALIGNMENT);
         setMaximumSize(new Dimension(Integer.MAX_VALUE, 36));
+
+        // Animação de Ripple (Onda)
+        rippleTimer = new Timer(16, e -> {
+            rippleRadius += 8f;
+            rippleAlpha -= 0.04f;
+            if (rippleAlpha <= 0f) {
+                rippleAlpha = 0f;
+                rippleTimer.stop();
+            }
+            repaint();
+        });
+
+        addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mousePressed(java.awt.event.MouseEvent e) {
+                clickPoint = e.getPoint();
+                rippleRadius = 10f;
+                rippleAlpha = 0.4f;
+                rippleTimer.start();
+            }
+        });
     }
 
     @Override
@@ -63,24 +90,69 @@ public class CardButton extends JButton implements Serializable {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Color bg = buttonColor;
-        if (getModel().isPressed()) {
-            bg = darker(bg, 0.85f);
-        } else if (getModel().isRollover()) {
-            bg = brighter(bg, 1.15f);
+        int w = getWidth();
+        int h = getHeight() - 2; // Deixa espaço em baixo para a sombra 3D real
+        int r = buttonRadius;
+
+        boolean isPressed = getModel().isPressed();
+        boolean isHover = getModel().isRollover();
+
+        // 1. Sombra 3D (Drop Shadow)
+        // Quando o botão não está pressionado, mostramos a sombra embaixo
+        if (!isPressed) {
+            g2.setColor(new Color(0, 0, 0, 25));
+            g2.fillRoundRect(0, 2, w, h, r, r);
+            g2.setColor(new Color(0, 0, 0, 12));
+            g2.fillRoundRect(0, 3, w, h, r, r);
         }
 
-        g2.setColor(bg);
-        g2.fillRoundRect(0, 0, getWidth(), getHeight(), buttonRadius, buttonRadius);
+        // 2. Cores e Gradiente Sutil (Efeito Premium)
+        Color topColor = isPressed ? darker(buttonColor, 0.90f) : (isHover ? brighter(buttonColor, 1.15f) : brighter(buttonColor, 1.08f));
+        Color bottomColor = isPressed ? darker(buttonColor, 0.95f) : (isHover ? buttonColor : darker(buttonColor, 0.92f));
+        
+        GradientPaint gp = isPressed 
+                ? new GradientPaint(0, 0, bottomColor, 0, h, topColor)
+                : new GradientPaint(0, 0, topColor, 0, h, bottomColor);
+        
+        int yOffset = isPressed ? 1 : 0; // Desce 1 pixel fisicamente ao clicar!
+        
+        g2.setPaint(gp);
+        g2.fillRoundRect(0, yOffset, w, h, r, r);
+
+        // 3. Borda Externa Crisp (Para dar definição e contraste)
+        g2.setColor(darker(buttonColor, 0.7f));
+        g2.setStroke(new BasicStroke(1f));
+        g2.drawRoundRect(0, yOffset, w - 1, h - 1, r, r);
+
+        // 4. Ripple Effect
+        if (rippleAlpha > 0f && clickPoint != null) {
+            Shape oldClip = g2.getClip();
+            g2.setClip(new java.awt.geom.RoundRectangle2D.Float(0, yOffset, w, h, r, r));
+            g2.setColor(new Color(255, 255, 255, (int) Math.max(0, Math.min(255, rippleAlpha * 255))));
+            float rr = rippleRadius;
+            g2.fill(new java.awt.geom.Ellipse2D.Float(clickPoint.x - rr, clickPoint.y - rr, rr * 2, rr * 2));
+            g2.setClip(oldClip);
+        }
+
         g2.dispose();
 
-        super.paintComponent(g);
+        // 5. Renderização do Texto (Anti-aliasing e deslocamento do clique)
+        Graphics2D gText = (Graphics2D) g;
+        gText.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
+        if (isPressed) {
+            gText.translate(0, 1);
+        }
+        super.paintComponent(gText);
+        if (isPressed) {
+            gText.translate(0, -1); // Restaura o translate após pintar
+        }
     }
 
     @Override
     public Dimension getPreferredSize() {
         Dimension d = super.getPreferredSize();
-        return new Dimension(d.width + 28, 34);
+        // Um pouco mais de margem lateral e altura para a sombra
+        return new Dimension(d.width + 32, 36);
     }
 
     private Color brighter(Color c, float factor) {

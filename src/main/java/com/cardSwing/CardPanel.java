@@ -169,9 +169,18 @@ public class CardPanel extends JPanel implements Serializable {
 
         // === SOMBRA ===
         if (shadowEnabled) {
-            for (int i = 4; i >= 1; i--) {
-                g2.setColor(new Color(0, 0, 0, 8 + (4 - i) * 5));
-                g2.fill(new RoundRectangle2D.Float(i, i + 1, w, h, r + 2, r + 2));
+            if (hover && hoverEnabled) {
+                // Efeito super moderno: sombra "Smooth" com leve deslocamento para baixo (elevação real)
+                for (int i = 5; i >= 1; i--) {
+                    g2.setColor(new Color(0, 0, 0, 10 + (5 - i) * 5));
+                    g2.fill(new RoundRectangle2D.Float(i - 1f, i, w, h, r + 2, r + 2));
+                }
+            } else {
+                // Sombra normal elegante
+                for (int i = 4; i >= 1; i--) {
+                    g2.setColor(new Color(0, 0, 0, 5 + (4 - i) * 4));
+                    g2.fill(new RoundRectangle2D.Float(i - 1f, i - 1f, w, h, r + 2, r + 2));
+                }
             }
         }
 
@@ -180,29 +189,25 @@ public class CardPanel extends JPanel implements Serializable {
         g2.setColor(hover && hoverEnabled ? new Color(249, 250, 251) : Color.WHITE);
         g2.fill(bgRect);
 
-        // === BORDA ===
-        // Desenhada antes do Theme Bar, assim a Theme Bar fica por cima e esconde a
-        // linha no topo!
-        if (hover && hoverEnabled && hoverBorderColor != null) {
-            g2.setColor(hoverBorderColor);
-            g2.setStroke(new BasicStroke(2f));
-            g2.draw(new RoundRectangle2D.Float(1, 1, w - 2, h - 2, r, r));
-        } else {
+        // === BORDA NORMAL ===
+        // Desenhada antes do Theme Bar para não cobrir a cor do topo azul
+        if (!hover || !hoverEnabled || hoverBorderColor == null) {
             g2.setColor(new Color(229, 231, 235));
             g2.setStroke(new BasicStroke(1f));
-            g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, w - 1, h - 1, r, r));
+            g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, w - 1f, h - 1f, r, r));
         }
 
         // === BARRA DE TEMA / HEADER ===
         if (themeColor != null) {
-            Shape oldClip = g2.getClip();
-            g2.setClip(bgRect); // Aplica máscara para respeitar os cantos redondos
-
             boolean hasTitle = (title != null && !title.trim().isEmpty());
             int headerHeight = hasTitle ? 38 : 5;
 
+            Shape oldClip = g2.getClip();
+            // Usamos um clip retangular (que não causa serrilhado) e preenchemos a forma arredondada!
+            g2.clipRect(0, 0, w, headerHeight);
+
             g2.setColor(themeColor);
-            g2.fillRect(0, 0, w, headerHeight);
+            g2.fill(bgRect);
 
             // Desenha o Título se existir
             if (hasTitle) {
@@ -221,6 +226,15 @@ public class CardPanel extends JPanel implements Serializable {
             }
 
             g2.setClip(oldClip); // Remove máscara
+        }
+
+        // === BORDA HOVER ===
+        // Desenhada DEPOIS do Theme Bar. Coordenadas e Stroke ajustados para ABRAÇAR perfeitamente
+        // o card, sem deixar o fundo azul vazar para fora!
+        if (hover && hoverEnabled && hoverBorderColor != null) {
+            g2.setColor(hoverBorderColor);
+            g2.setStroke(new BasicStroke(1.5f));
+            g2.draw(new RoundRectangle2D.Float(0.5f, 0.5f, w - 1f, h - 1f, r, r));
         }
 
         // === RIPPLE EFFECT ===
