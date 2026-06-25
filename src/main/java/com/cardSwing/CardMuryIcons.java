@@ -85,6 +85,20 @@ public class CardMuryIcons {
             g2.fillOval(2, 6, 4, 4);
             g2.setColor(new Color(51, 65, 85));
             g2.fillRect(8, 7, 6, 2);
+        } else if (name.equals("CardTextField")) {
+            g2.setColor(Color.WHITE);
+            g2.fillRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(209, 213, 219));
+            g2.drawRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(59, 130, 246));
+            g2.drawLine(4, 6, 4, 10);
+        } else if (name.equals("CardComboBox")) {
+            g2.setColor(Color.WHITE);
+            g2.fillRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(209, 213, 219));
+            g2.drawRoundRect(1, 4, 14, 8, 2, 2);
+            g2.setColor(new Color(107, 114, 128));
+            g2.fillPolygon(new int[]{10, 13, 11}, new int[]{7, 7, 10}, 3);
         } else {
             // Default genérico
             g2.setColor(Color.GRAY);

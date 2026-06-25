@@ -51,6 +51,8 @@ Todos os componentes possuem a categoria exclusiva **"CardSwing Configs"** na ja
 - **`CardSwitch`:** Substitui os checkboxes feios por um Toggle moderno (estilo botão do iPhone), com transição suave.
 - **`CardButton` & `CardButtonRow`:** Botões com cantos arredondados e mudança de cor inteligente ao passar o mouse ou clicar. O Row garante espaçamento perfeito lado a lado.
 - **`CardCheck`:** Checkbox minimalista com ícone desenhado à mão (adeus look and feel quebrado do Windows!).
+- **`CardTextField`:** Campo de texto (input) moderno com cantos arredondados, padding confortável, borda reativa ao hover e anel de foco customizável.
+- **`CardComboBox`:** Caixa de seleção (combo) totalmente reestilizada para combinar com o CardTextField, com menu flutuante minimalista, scrollbars suavizadas e setinha moderna.
 
 ### 🖼️ Dados e Visuais
 - **`CardAvatar`:** Renderiza uma foto de perfil em um círculo perfeito ou, na ausência de foto, exibe Iniciais com uma cor de fundo. Pode exibir uma bolinha verde de "Online".
