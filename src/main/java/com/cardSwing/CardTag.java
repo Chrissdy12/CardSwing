@@ -70,6 +70,14 @@ public class CardTag extends JPanel implements Serializable {
         }
     }
 
+    @Override
+    public Font getFont() {
+        if (label != null) {
+            return label.getFont();
+        }
+        return super.getFont();
+    }
+
     // === PROPRIEDADES ===
 
     /** Texto da tag. */

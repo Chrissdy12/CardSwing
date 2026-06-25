@@ -42,3 +42,4 @@ public class CardPasswordFieldBeanInfo extends SimpleBeanInfo {
         }
     }
 }
+

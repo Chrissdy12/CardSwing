@@ -40,3 +40,4 @@ public class CardTabsBeanInfo extends SimpleBeanInfo {
         }
     }
 }
+

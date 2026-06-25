@@ -103,15 +103,23 @@ public class CardStatusBadge extends JPanel implements Serializable {
     }
 
     @Override
+    public Font getFont() {
+        if (labelPart != null) {
+            return labelPart.getFont();
+        }
+        return super.getFont();
+    }
+
+    @Override
     public void setFont(Font font) {
         super.setFont(font);
         if (font != null) {
             this.fontSize = font.getSize();
             if (labelPart != null) {
-                labelPart.setFont(new Font(font.getFamily(), Font.PLAIN, this.fontSize));
+                labelPart.setFont(new Font(font.getFamily(), font.getStyle(), this.fontSize));
             }
             if (valuePart != null) {
-                valuePart.setFont(new Font(font.getFamily(), Font.BOLD, this.fontSize));
+                valuePart.setFont(new Font(font.getFamily(), font.getStyle(), this.fontSize));
             }
             updateDotSize();
         }

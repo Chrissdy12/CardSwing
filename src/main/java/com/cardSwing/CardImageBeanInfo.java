@@ -25,7 +25,7 @@ public class CardImageBeanInfo extends SimpleBeanInfo {
     public PropertyDescriptor[] getPropertyDescriptors() {
         try {
             List<PropertyDescriptor> props = new ArrayList<>();
-            String[] customProps = {
+                        String[] customProps = {
                 "text", "title", "titleIcon", "font", "foreground", "background", "icon", "selected", 
                 "progress", "currentValue", "totalValue", "showPercentage",
                 "barColor", "trackColor", "showLabel", "barHeight", 
@@ -38,7 +38,11 @@ public class CardImageBeanInfo extends SimpleBeanInfo {
                 "shadowEnabled", "hoverEnabled", "cardWidth", "columns", "scrollSpeed",
                 "checkColor", "titleColor", "subtitleColor", "fontSize",
                 "collapsible", "clickable", "showSearch", "initials", "avatarColor", 
-                "showOnlineDot", "avatarSize", "trackOnColor", "trackOffColor", "knobColor"
+                "showOnlineDot", "avatarSize", "trackOnColor", "trackOffColor", "knobColor", "lineWrap",
+                "borderColor", "chartColor", "chartType", "colors", "focusColor", "gridColor",
+                "headerColor", "headerTextColor", "items", "labels", "localDate", "localDateTime",
+                "onButtonClick", "onCardClick", "onScrollEnd", "onSearch", "placeholder", "radius",
+                "rowHoverColor", "showGrid", "titlePosition", "unselectedTextColor", "values"
             };
 
             for (String propName : customProps) {
