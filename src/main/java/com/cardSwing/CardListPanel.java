@@ -100,6 +100,16 @@ public class CardListPanel extends JPanel implements Serializable {
         container.repaint();
     }
 
+    /** Adiciona uma lista de componentes como cards de uma vez. */
+    public void addCards(java.util.List<? extends Component> cards) {
+        if (cards == null || cards.isEmpty()) return;
+        for (Component card : cards) {
+            container.add(card);
+        }
+        container.revalidate();
+        container.repaint();
+    }
+
     /** Remove um card. */
     public void removeCard(Component card) {
         container.remove(card);
