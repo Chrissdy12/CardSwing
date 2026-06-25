@@ -13,6 +13,7 @@ public class CardAvatarBeanInfo extends SimpleBeanInfo {
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CardAvatar.class);
         bd.setDisplayName("CardAvatar");
+        bd.setValue("isContainer", Boolean.FALSE);
         return bd;
     }
     

@@ -3,13 +3,16 @@ package com.cardSwing;
 import java.awt.*;
 import java.awt.geom.Ellipse2D;
 import java.io.File;
+import java.io.Serializable;
 import javax.swing.*;
 import javax.imageio.ImageIO;
 
 /**
  * Avatar circular com imagem ou iniciais e bolinha de status.
  */
-public class CardAvatar extends JPanel {
+public class CardAvatar extends JPanel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
 
     private String initials = "CH";
     private String imagePath = "";

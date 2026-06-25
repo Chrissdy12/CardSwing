@@ -11,16 +11,21 @@ import javax.swing.*;
  * Componente visual de Card — o container principal.
  * Renderiza bordas arredondadas, sombra, barra de tema e efeito hover.
  *
- * <p><b>PALETTE:</b> Arraste para o form. Depois arraste CardTitle, CardButton,
- * CardCheck, etc. para dentro dele.</p>
+ * <p>
+ * <b>PALETTE:</b> Arraste para o form. Depois arraste CardTitle, CardButton,
+ * CardCheck, etc. para dentro dele.
+ * </p>
  *
- * <p><b>PROGRAMÁTICO:</b></p>
+ * <p>
+ * <b>PROGRAMÁTICO:</b>
+ * </p>
+ * 
  * <pre>
- *   CardPanel card = new CardPanel();
- *   card.add(new CardTitle("Meu Título"));
- *   card.add(new CardSeparator());
- *   card.add(new CardCheck("Ativo"));
- *   card.add(new CardButton("Salvar"));
+ * CardPanel card = new CardPanel();
+ * card.add(new CardTitle("Meu Título"));
+ * card.add(new CardSeparator());
+ * card.add(new CardCheck("Ativo"));
+ * card.add(new CardButton("Salvar"));
  * </pre>
  */
 public class CardPanel extends JPanel implements Serializable {
@@ -49,7 +54,8 @@ public class CardPanel extends JPanel implements Serializable {
 
     public CardPanel() {
         setOpaque(false);
-        setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
+        // Sem layout forçado - o NetBeans vai usar o Free Design (GroupLayout) ou
+        // FlowLayout por padrão.
         setBackground(Color.WHITE);
 
         updatePadding();
@@ -67,12 +73,18 @@ public class CardPanel extends JPanel implements Serializable {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
-                if (hoverEnabled) { hover = true; repaint(); }
+                if (hoverEnabled) {
+                    hover = true;
+                    repaint();
+                }
             }
+
             @Override
             public void mouseExited(MouseEvent e) {
-                hover = false; repaint();
+                hover = false;
+                repaint();
             }
+
             @Override
             public void mousePressed(MouseEvent e) {
                 if (clickable) {
@@ -82,6 +94,7 @@ public class CardPanel extends JPanel implements Serializable {
                     rippleTimer.start();
                 }
             }
+
             @Override
             public void mouseClicked(MouseEvent e) {
                 boolean hasTitle = (title != null && !title.trim().isEmpty());
@@ -99,8 +112,9 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     private void updatePadding() {
+        int sh = shadowEnabled ? 5 : 0;
         int top = (title != null && !title.trim().isEmpty()) ? 48 : 22;
-        setBorder(BorderFactory.createEmptyBorder(top, 18, 18, 18));
+        setBorder(BorderFactory.createEmptyBorder(top, 10, 10 + sh, 10 + sh));
         revalidate();
         repaint();
     }
@@ -117,8 +131,24 @@ public class CardPanel extends JPanel implements Serializable {
             int headerHeight = hasTitle ? 38 : 5;
             return new Dimension(cardWidth + sh, headerHeight + sh);
         }
-        Dimension layoutPref = getLayout().preferredLayoutSize(this);
-        int h = layoutPref.height + sh;
+
+        LayoutManager layout = getLayout();
+        int h = 50; // altura padrão caso não seja possível calcular
+        if (layout != null) {
+            Dimension layoutPref = layout.preferredLayoutSize(this);
+            if (layoutPref != null) {
+                h = layoutPref.height;
+            }
+        } else {
+            Dimension sup = super.getPreferredSize();
+            if (sup != null) {
+                h = sup.height;
+            }
+        }
+
+        // A altura (h) já inclui a margem inferior que configuramos no updatePadding, 
+        // e essa margem agora já engloba o espaço da sombra (+ sh). 
+        // Portanto, não precisamos somar 'sh' novamente aqui na altura.
         return new Dimension(cardWidth + sh, h);
     }
 
@@ -151,7 +181,8 @@ public class CardPanel extends JPanel implements Serializable {
         g2.fill(bgRect);
 
         // === BORDA ===
-        // Desenhada antes do Theme Bar, assim a Theme Bar fica por cima e esconde a linha no topo!
+        // Desenhada antes do Theme Bar, assim a Theme Bar fica por cima e esconde a
+        // linha no topo!
         if (hover && hoverEnabled && hoverBorderColor != null) {
             g2.setColor(hoverBorderColor);
             g2.setStroke(new BasicStroke(2f));
@@ -166,29 +197,29 @@ public class CardPanel extends JPanel implements Serializable {
         if (themeColor != null) {
             Shape oldClip = g2.getClip();
             g2.setClip(bgRect); // Aplica máscara para respeitar os cantos redondos
-            
+
             boolean hasTitle = (title != null && !title.trim().isEmpty());
             int headerHeight = hasTitle ? 38 : 5;
-            
+
             g2.setColor(themeColor);
             g2.fillRect(0, 0, w, headerHeight);
-            
+
             // Desenha o Título se existir
             if (hasTitle) {
-                int textX = 18;
+                int textX = 10;
                 if (titleIcon != null) {
                     int iconY = (headerHeight - titleIcon.getIconHeight()) / 2;
                     titleIcon.paintIcon(this, g2, textX, iconY);
                     textX += titleIcon.getIconWidth() + 8;
                 }
-                
+
                 g2.setColor(titleColor);
                 g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
                 FontMetrics fm = g2.getFontMetrics();
                 int textY = (headerHeight - fm.getHeight()) / 2 + fm.getAscent();
                 g2.drawString(title, textX, textY);
             }
-            
+
             g2.setClip(oldClip); // Remove máscara
         }
 
@@ -220,7 +251,10 @@ public class CardPanel extends JPanel implements Serializable {
     // =========================================================================
 
     /** Cor da barra decorativa no topo do card. */
-    public Color getThemeColor() { return themeColor; }
+    public Color getThemeColor() {
+        return themeColor;
+    }
+
     public void setThemeColor(Color themeColor) {
         Color old = this.themeColor;
         this.themeColor = themeColor;
@@ -229,7 +263,10 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Cor da borda ao passar o mouse. */
-    public Color getHoverBorderColor() { return hoverBorderColor; }
+    public Color getHoverBorderColor() {
+        return hoverBorderColor;
+    }
+
     public void setHoverBorderColor(Color hoverBorderColor) {
         Color old = this.hoverBorderColor;
         this.hoverBorderColor = hoverBorderColor;
@@ -237,7 +274,10 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Raio das bordas arredondadas (pixels). */
-    public int getCornerRadius() { return cornerRadius; }
+    public int getCornerRadius() {
+        return cornerRadius;
+    }
+
     public void setCornerRadius(int cornerRadius) {
         int old = this.cornerRadius;
         this.cornerRadius = Math.max(0, cornerRadius);
@@ -246,16 +286,22 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Habilita sombra suave. */
-    public boolean isShadowEnabled() { return shadowEnabled; }
+    public boolean isShadowEnabled() {
+        return shadowEnabled;
+    }
+
     public void setShadowEnabled(boolean shadowEnabled) {
         boolean old = this.shadowEnabled;
         this.shadowEnabled = shadowEnabled;
         firePropertyChange("shadowEnabled", old, shadowEnabled);
-        repaint();
+        updatePadding();
     }
 
     /** Habilita efeito hover (borda + fundo). */
-    public boolean isHoverEnabled() { return hoverEnabled; }
+    public boolean isHoverEnabled() {
+        return hoverEnabled;
+    }
+
     public void setHoverEnabled(boolean hoverEnabled) {
         boolean old = this.hoverEnabled;
         this.hoverEnabled = hoverEnabled;
@@ -263,7 +309,10 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Largura do card (pixels). */
-    public int getCardWidth() { return cardWidth; }
+    public int getCardWidth() {
+        return cardWidth;
+    }
+
     public void setCardWidth(int cardWidth) {
         int old = this.cardWidth;
         this.cardWidth = Math.max(150, cardWidth);
@@ -273,7 +322,10 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Título do Header (se preenchido, cria um cabeçalho colorido). */
-    public String getTitle() { return title; }
+    public String getTitle() {
+        return title;
+    }
+
     public void setTitle(String title) {
         String old = this.title;
         this.title = title;
@@ -282,7 +334,10 @@ public class CardPanel extends JPanel implements Serializable {
     }
 
     /** Cor do texto do Título do Header. */
-    public Color getTitleColor() { return titleColor; }
+    public Color getTitleColor() {
+        return titleColor;
+    }
+
     public void setTitleColor(Color titleColor) {
         Color old = this.titleColor;
         this.titleColor = titleColor;
@@ -290,7 +345,10 @@ public class CardPanel extends JPanel implements Serializable {
         repaint();
     }
 
-    public Icon getTitleIcon() { return titleIcon; }
+    public Icon getTitleIcon() {
+        return titleIcon;
+    }
+
     public void setTitleIcon(Icon titleIcon) {
         Icon old = this.titleIcon;
         this.titleIcon = titleIcon;
@@ -298,25 +356,34 @@ public class CardPanel extends JPanel implements Serializable {
         repaint();
     }
 
-    public boolean isCollapsible() { return collapsible; }
+    public boolean isCollapsible() {
+        return collapsible;
+    }
+
     public void setCollapsible(boolean collapsible) {
         boolean old = this.collapsible;
         this.collapsible = collapsible;
         firePropertyChange("collapsible", old, collapsible);
         if (!collapsible && collapsed) {
             collapsed = false;
-            for (Component c : getComponents()) c.setVisible(true);
+            for (Component c : getComponents())
+                c.setVisible(true);
             revalidate();
             repaint();
         }
     }
 
-    public boolean isClickable() { return clickable; }
+    public boolean isClickable() {
+        return clickable;
+    }
+
     public void setClickable(boolean clickable) {
         boolean old = this.clickable;
         this.clickable = clickable;
-        if (clickable) setCursor(new Cursor(Cursor.HAND_CURSOR));
-        else setCursor(Cursor.getDefaultCursor());
+        if (clickable)
+            setCursor(new Cursor(Cursor.HAND_CURSOR));
+        else
+            setCursor(Cursor.getDefaultCursor());
         firePropertyChange("clickable", old, clickable);
     }
 }
