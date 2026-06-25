@@ -27,8 +27,15 @@ public class CardToast extends JDialog {
     private int targetY;
     private int currentY;
 
-    private CardToast(JFrame parent, String message, Type type) {
-        super(parent, false);
+    private static Window getWindow(Component parentComponent) {
+        if (parentComponent == null) return null;
+        if (parentComponent instanceof Window) return (Window) parentComponent;
+        return SwingUtilities.getWindowAncestor(parentComponent);
+    }
+
+    private CardToast(Component parentComponent, String message, Type type) {
+        super(getWindow(parentComponent));
+        setModal(false);
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 0)); // transparent background
         setAlwaysOnTop(true);
@@ -105,18 +112,21 @@ public class CardToast extends JDialog {
         
         setSize(Math.max(getWidth(), 250), getHeight() + 4);
 
-        if (parent != null) {
+        if (parentComponent != null) {
             try {
-                Container parentContent = parent.getContentPane();
-                Point p = parentContent.getLocationOnScreen();
-                Dimension s = parentContent.getSize();
+                Component target = parentComponent;
+                if (parentComponent instanceof RootPaneContainer) {
+                    target = ((RootPaneContainer) parentComponent).getContentPane();
+                }
+                Point p = target.getLocationOnScreen();
+                Dimension s = target.getSize();
                 int x = p.x + s.width - getWidth() - 20;
                 targetY = p.y + s.height - getHeight() - 20;
                 currentY = targetY + 50; 
                 setLocation(x, currentY);
             } catch (Exception ex) {
-                int x = parent.getX() + parent.getWidth() - getWidth() - 20;
-                targetY = parent.getY() + parent.getHeight() - getHeight() - 20;
+                int x = parentComponent.getX() + parentComponent.getWidth() - getWidth() - 20;
+                targetY = parentComponent.getY() + parentComponent.getHeight() - getHeight() - 20;
                 currentY = targetY + 50; 
                 setLocation(x, currentY);
             }
@@ -192,16 +202,16 @@ public class CardToast extends JDialog {
     }
 
     // === API ESTÁTICA PÚBLICA ===
-    public static void showSuccess(JFrame parent, String message) {
+    public static void showSuccess(Component parent, String message) {
         new CardToast(parent, message, Type.SUCCESS);
     }
-    public static void showError(JFrame parent, String message) {
+    public static void showError(Component parent, String message) {
         new CardToast(parent, message, Type.ERROR);
     }
-    public static void showInfo(JFrame parent, String message) {
+    public static void showInfo(Component parent, String message) {
         new CardToast(parent, message, Type.INFO);
     }
-    public static void showWarning(JFrame parent, String message) {
+    public static void showWarning(Component parent, String message) {
         new CardToast(parent, message, Type.WARNING);
     }
 }

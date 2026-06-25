@@ -14,9 +14,16 @@ public class CardDialog extends JDialog {
     private boolean confirmed = false;
     private String inputValue = null;
 
+    private static Window getWindow(Component parentComponent) {
+        if (parentComponent == null) return null;
+        if (parentComponent instanceof Window) return (Window) parentComponent;
+        return SwingUtilities.getWindowAncestor(parentComponent);
+    }
+
     // Construtor privado (usado internamente pelos métodos estáticos)
-    private CardDialog(JFrame parent, String title, String message, boolean isInput, Object[] options) {
-        super(parent, true);
+    private CardDialog(Component parentComponent, String title, String message, boolean isInput, Object[] options) {
+        super(getWindow(parentComponent));
+        setModal(true);
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 80)); // Fundo escuro semi-transparente (Backdrop)
 
@@ -177,14 +184,17 @@ public class CardDialog extends JDialog {
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
         
         // Define o tamanho igual ao do parent (overlay total apenas na área de conteúdo)
-        if (parent != null) {
+        if (parentComponent != null) {
             try {
-                Container content = parent.getContentPane();
-                Point p = content.getLocationOnScreen();
-                Dimension s = content.getSize();
+                Component target = parentComponent;
+                if (parentComponent instanceof RootPaneContainer) {
+                    target = ((RootPaneContainer) parentComponent).getContentPane();
+                }
+                Point p = target.getLocationOnScreen();
+                Dimension s = target.getSize();
                 setBounds(p.x, p.y, s.width, s.height);
             } catch (Exception ex) {
-                setBounds(parent.getBounds());
+                setBounds(parentComponent.getBounds());
             }
         } else {
             Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
@@ -206,7 +216,7 @@ public class CardDialog extends JDialog {
      * 
      * @return true se clicou em "Confirmar", false se cancelou ou fechou.
      */
-    public static boolean showConfirm(JFrame parent, String title, String message) {
+    public static boolean showConfirm(Component parent, String title, String message) {
         CardDialog dialog = new CardDialog(parent, title, message, false, null);
         dialog.setVisible(true); // Trava a tela aqui até fechar
         return dialog.confirmed;
@@ -218,7 +228,7 @@ public class CardDialog extends JDialog {
      * 
      * @return O texto digitado, ou null se o usuário cancelou.
      */
-    public static String showInput(JFrame parent, String title, String message) {
+    public static String showInput(Component parent, String title, String message) {
         CardDialog dialog = new CardDialog(parent, title, message, true, null);
         dialog.setVisible(true); // Trava a tela aqui até fechar
         
@@ -234,7 +244,7 @@ public class CardDialog extends JDialog {
      * 
      * @return O item selecionado como String, ou null se o usuário cancelou.
      */
-    public static String showComboInput(JFrame parent, String title, String message, Object[] options) {
+    public static String showComboInput(Component parent, String title, String message, Object[] options) {
         CardDialog dialog = new CardDialog(parent, title, message, true, options);
         dialog.setVisible(true); // Trava a tela aqui até fechar
         
