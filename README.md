@@ -109,10 +109,3 @@ model.setOnButtonClick(produto -> abrirTelaEdicao(produto));
 meuCardListPanel.setOnSearch(textoDigitado -> refazerBusca(textoDigitado));
 ```
 
----
-
-## 🛠️ Demonstração Interativa
-Para ver tudo isso rodando na sua máquina, execute o arquivo:
-`com.CardSwing.examples.DemoFrame.java`
-
-Lá você poderá clicar em todos os componentes, testar o botão Skeleton Loading, interagir com o CardSwitch e muito mais. Divirta-se criando sistemas bonitos com Java!
