@@ -29,6 +29,11 @@ public class CardGrafic extends JPanel implements Serializable {
         TOP_LEFT, TOP_CENTER, TOP_RIGHT, BOTTOM_CENTER
     }
 
+    private static final Font FONT_TITLE = new Font("Segoe UI", Font.BOLD, 14);
+    private static final Font FONT_BOLD_12 = new Font("Segoe UI", Font.BOLD, 12);
+    private static final Font FONT_PLAIN_11 = new Font("Segoe UI", Font.PLAIN, 11);
+    private static final Font FONT_PLAIN_10 = new Font("Segoe UI", Font.PLAIN, 10);
+
     private ChartType chartType = ChartType.BAR;
     private String values = "15, 30, 45, 10, 25";
     private String labels = "Jan, Fev, Mar, Abr, Mai";
@@ -53,9 +58,17 @@ public class CardGrafic extends JPanel implements Serializable {
     private List<Color> activeColors = new ArrayList<>();
     private boolean useDataBinding = false;
 
+    // Cache para os valores das propriedades String para evitar parsing no paintComponent
+    private List<Double> parsedValuesList;
+    private List<String> parsedLabelsList;
+    private List<Color> activeColorsList;
+
     public CardGrafic() {
         setOpaque(false);
         setPreferredSize(new Dimension(300, 200));
+        parsedValuesList = parseValues(values);
+        parsedLabelsList = parseLabels(labels);
+        activeColorsList = parseColors(colors);
     }
 
     @Override
@@ -93,9 +106,9 @@ public class CardGrafic extends JPanel implements Serializable {
             g2.drawString(title, titleX, titleY);
         }
 
-        List<Double> parsedValues = useDataBinding ? dataValues : parseValues(values);
-        List<String> parsedLabels = useDataBinding ? dataLabels : parseLabels(labels);
-        this.activeColors = useDataBinding ? customColors : parseColors(colors);
+        List<Double> parsedValues = useDataBinding ? dataValues : parsedValuesList;
+        List<String> parsedLabels = useDataBinding ? dataLabels : parsedLabelsList;
+        this.activeColors = useDataBinding ? customColors : activeColorsList;
 
         if (parsedValues.isEmpty()) {
             g2.dispose();
@@ -114,7 +127,7 @@ public class CardGrafic extends JPanel implements Serializable {
         
         int leftMargin = 30;
         if (isHoriz && showLabels) {
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fmLbl = g2.getFontMetrics();
             int maxLblWidth = 0;
             for (String l : parsedLabels) {
@@ -126,7 +139,7 @@ public class CardGrafic extends JPanel implements Serializable {
 
         int maxValStrWidth = 0;
         if (showLabels && (chartType == ChartType.HORIZONTAL_BAR_GRADIENT || chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP_COLORFUL)) {
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fmVal = g2.getFontMetrics();
             for (Double v : parsedValues) {
                 String vs = (v == Math.floor(v)) ? String.valueOf((int) v.doubleValue()) : String.valueOf(v);
@@ -179,7 +192,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 
                 // Draw X axis labels (values)
                 String xLabel = String.valueOf((int) ((maxVal / gridLines) * i));
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                g2.setFont(FONT_PLAIN_10);
                 g2.setColor(textColor);
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(xLabel, lineX - (fm.stringWidth(xLabel) / 2), y + height + 15);
@@ -206,7 +219,7 @@ public class CardGrafic extends JPanel implements Serializable {
             // Draw Y labels (categories)
             if (showLabels && i < lbls.size()) {
                 String lbl = lbls.get(i);
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+                g2.setFont(FONT_PLAIN_11);
                 g2.setColor(textColor);
                 FontMetrics fm = g2.getFontMetrics();
                 // truncate long labels
@@ -246,14 +259,14 @@ public class CardGrafic extends JPanel implements Serializable {
 
             if (showLabels && i < lbls.size()) {
                 String lbl = lbls.get(i);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2.setFont(FONT_BOLD_12);
                 g2.setColor(new Color(51, 65, 85)); 
                 g2.drawString(lbl, x, by - 6);
             }
 
             if (showLabels) {
                 String valStr = (v == Math.floor(v)) ? String.valueOf((int) v) : String.valueOf(v);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+                g2.setFont(FONT_BOLD_12);
                 g2.setColor(getColor(i, modernColors));
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(valStr, x + width - fm.stringWidth(valStr), by - 6);
@@ -293,7 +306,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 g2.fillRoundRect(x, by, valWidth, barHeight, barHeight, barHeight);
             }
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
             
             // Texto da label por cima da barra (ou fora se for muito pequena)
@@ -342,7 +355,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 g2.fillRoundRect(bx, py, barWidth, valHeight, barWidth, barWidth);
             }
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
 
             // Valor no topo flutuando
@@ -384,7 +397,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 g2.fillRoundRect(bx, py, barWidth, valHeight, 10, 10);
             }
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
 
             if (showLabels) {
@@ -423,7 +436,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 g2.fillRoundRect(x, by, valWidth, barHeight, 10, 10);
             }
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
 
             if (showLabels && i < lbls.size()) {
@@ -463,7 +476,7 @@ public class CardGrafic extends JPanel implements Serializable {
             int radius = 12;
             g2.fillOval(px - radius/2, py - radius/2, radius, radius);
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
 
             if (showLabels) {
@@ -502,7 +515,7 @@ public class CardGrafic extends JPanel implements Serializable {
             int radius = 12;
             g2.fillOval(x + valWidth - radius/2, py - radius/2, radius, radius);
 
-            g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
+            g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
 
             if (showLabels && i < lbls.size()) {
@@ -531,7 +544,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 
                 // Draw Y axis labels
                 String yLabel = String.valueOf((int) ((maxVal / gridLines) * i));
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 10));
+                g2.setFont(FONT_PLAIN_10);
                 g2.setColor(textColor);
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(yLabel, x - fm.stringWidth(yLabel) - 5, lineY + (fm.getAscent() / 2));
@@ -575,7 +588,7 @@ public class CardGrafic extends JPanel implements Serializable {
             // Draw X labels
             if (showLabels && i < lbls.size()) {
                 String lbl = lbls.get(i);
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+                g2.setFont(FONT_PLAIN_11);
                 g2.setColor(textColor);
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(lbl, px - (fm.stringWidth(lbl) / 2), y + height + 15);
@@ -637,7 +650,7 @@ public class CardGrafic extends JPanel implements Serializable {
                 int ly = (int) (cy + size/2 - Math.sin(midAngle) * (size/2 + 15));
                 
                 String lbl = lbls.get(i);
-                g2.setFont(new Font("Segoe UI", Font.PLAIN, 11));
+                g2.setFont(FONT_PLAIN_11);
                 g2.setColor(textColor);
                 FontMetrics fm = g2.getFontMetrics();
                 g2.drawString(lbl, lx - (fm.stringWidth(lbl)/2), ly + (fm.getAscent()/2));
@@ -758,6 +771,7 @@ public class CardGrafic extends JPanel implements Serializable {
         String old = this.values;
         this.values = values;
         this.useDataBinding = false;
+        this.parsedValuesList = parseValues(values);
         firePropertyChange("values", old, values);
         repaint();
     }
@@ -767,6 +781,7 @@ public class CardGrafic extends JPanel implements Serializable {
         String old = this.labels;
         this.labels = labels;
         this.useDataBinding = false;
+        this.parsedLabelsList = parseLabels(labels);
         firePropertyChange("labels", old, labels);
         repaint();
     }
@@ -776,6 +791,7 @@ public class CardGrafic extends JPanel implements Serializable {
         String old = this.colors;
         this.colors = colors;
         this.useDataBinding = false;
+        this.activeColorsList = parseColors(colors);
         firePropertyChange("colors", old, colors);
         repaint();
     }

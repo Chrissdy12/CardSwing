@@ -29,8 +29,10 @@ public class CardSkeleton extends JPanel {
         
         // Tenta iniciar a animação só quando visível para economizar CPU
         addPropertyChangeListener("ancestor", e -> {
-            if (e.getNewValue() != null) timer.start();
-            else timer.stop();
+            if (!java.beans.Beans.isDesignTime()) {
+                if (e.getNewValue() != null) timer.start();
+                else timer.stop();
+            }
         });
     }
 

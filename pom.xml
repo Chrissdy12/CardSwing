@@ -11,13 +11,6 @@
         <maven.compiler.target>11</maven.compiler.target>
     </properties>
     <name>CardSwing</name>
-    <dependencies>
-        <dependency>
-            <groupId>br.com.muryapi</groupId>
-            <artifactId>muryapi-mvn</artifactId>
-            <version>1.4</version>
-        </dependency>
-    </dependencies>
     <build>
         <plugins>
             <plugin>

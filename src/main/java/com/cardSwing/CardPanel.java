@@ -51,6 +51,7 @@ public class CardPanel extends JPanel implements Serializable {
     private float rippleRadius = 0f;
     private float rippleAlpha = 0f;
     private Timer rippleTimer;
+    private final Font titleFont = new Font("Segoe UI", Font.BOLD, 14);
 
     public CardPanel() {
         setOpaque(false);
@@ -194,7 +195,7 @@ public class CardPanel extends JPanel implements Serializable {
                 }
 
                 g2.setColor(titleColor);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                g2.setFont(titleFont);
                 FontMetrics fm = g2.getFontMetrics();
                 int textY = (headerHeight - fm.getHeight()) / 2 + fm.getAscent();
                 g2.drawString(title, textX, textY);
