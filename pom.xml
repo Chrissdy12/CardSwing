@@ -70,6 +70,5 @@
                 </plugin>
             </plugins>
         </pluginManagement>
-        <finalName>${project.name}</finalName>
     </build>
 </project>
