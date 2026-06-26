@@ -64,21 +64,49 @@ O motor principal do framework. Altera todo o LookAndFeel (incluindo JPanels, JB
 - `getCurrentTheme()`
 
 ```java
+// Escolha entre 5 Temas Premium embutidos:
+CardThemeManager.applyTheme(CardThemeManager.CardTheme.LIGHT);
 CardThemeManager.applyTheme(CardThemeManager.CardTheme.DARK);
+CardThemeManager.applyTheme(CardThemeManager.CardTheme.MIDNIGHT);
+CardThemeManager.applyTheme(CardThemeManager.CardTheme.FOREST);
+CardThemeManager.applyTheme(CardThemeManager.CardTheme.SUNSET);
 ```
 
 ## 2. CardGrafic
-Gráfico vetorial de altíssimo desempenho sem dependências.
-- `setValues(List<Double>)`, `setLabels(List<String>)`
-- `setChartType(ChartType)`: PIE, DONUT, DONUT_ROUNDED, GAUGE, BAR, BAR_MODERN, BAR_GRADIENT, BAR_LOLLIPOP, HORIZONTAL_BAR, LINE, LINE_SMOOTH, AREA, AREA_SMOOTH, AREA_SMOOTH_GRADIENT.
+Gráfico vetorial de altíssimo desempenho sem dependências externas.
+- `setChartType(ChartType)`: PIE, DONUT, GAUGE, BAR, HORIZONTAL_BAR, LINE, AREA, etc (com variações `_MODERN`, `_GRADIENT`, `_LOLLIPOP`).
 - `setChartColor(Color)`, `setShowGrid(boolean)`
 
+**O CardGrafic possui 3 formas incríveis de receber dados:**
+
+### Forma 1: Via String (Ideal para arrastar no NetBeans)
 ```java
 CardGrafic grafico = new CardGrafic();
 grafico.setChartType(CardGrafic.ChartType.AREA_SMOOTH_GRADIENT);
-grafico.setChartColor(new Color(59, 130, 246)); 
-grafico.setValues(Arrays.asList(150.0, 230.0, 180.0));
-grafico.setLabels(Arrays.asList("Jan", "Fev", "Mar"));
+grafico.setValues("150.0, 230.0, 180.0"); // Usa String separada por vírgula
+grafico.setLabels("Jan, Fev, Mar");
+```
+
+### Forma 2: Data Binding com Objetos (Extraindo Valores)
+Passe uma lista do banco de dados e ensine o gráfico a extrair o Nome e o Valor usando Lambdas:
+```java
+List<Venda> vendas = bancoDeDados.getVendasMes();
+
+CardGrafic graficoBarras = new CardGrafic();
+graficoBarras.setChartType(CardGrafic.ChartType.BAR_GRADIENT);
+// Extrai o nome do vendedor e o total de vendas de cada objeto
+graficoBarras.setItems(vendas, Venda::getNomeVendedor, Venda::getTotalVendido);
+```
+
+### Forma 3: Data Binding por Agrupamento (Contagem Automática)
+Passe uma lista "crua" e ensine o gráfico a agrupar e contar as ocorrências automaticamente (Ideal para Gráficos de Pizza/Status):
+```java
+List<Cliente> clientes = bancoDeDados.getClientes();
+
+CardGrafic graficoPizza = new CardGrafic();
+graficoPizza.setChartType(CardGrafic.ChartType.DONUT_ROUNDED);
+// Conta quantos clientes existem em cada "Status" e monta as fatias da Pizza sozinho!
+graficoPizza.setItemsObjectCount(clientes, Cliente::getStatus);
 ```
 
 ## 3. CardTable
@@ -95,47 +123,70 @@ tabela.setModel(model);
 ```
 
 ## 4. CardListPanel
-Grid ou Lista vertical flexível para abrigar múltiplos Cards. Funciona perfeitamente com a classe abstrata secundária `CardListModel` para preenchimento dinâmico.
-- `setColumns(int)`
-- `setGap(int)`
+Grid ou Lista vertical flexível para abrigar múltiplos Cards. Funciona lado a lado com a classe abstrata `CardListModel` para gerar cards visualmente a partir dos seus objetos (Data Binding).
 
+**Exemplo de como CRIAR seu modelo e UTILIZÁ-LO na tela:**
 ```java
+// 1. COMO CRIAR O MODELO (Você ensina o framework a desenhar 1 Card)
+public class ProdutoModel extends CardListModel<Produto> {
+    @Override
+    protected void configureCard(Produto p, CardPanel card) {
+        card.add(new CardTitle(p.getNome()));
+        card.add(new CardSubtitle("R$ " + p.getPreco()));
+        card.add(new CardSeparator());
+        card.add(new CardButtonRow().addButton("Comprar", Color.BLUE, () -> fireButtonClick(p)));
+    }
+}
+
+// 2. COMO UTILIZAR NA TELA (O framework replica o design pra todos os itens sozinho)
 CardListPanel lista = new CardListPanel();
-lista.setColumns(2); // Grid 2x2
-// Usando o model abstrato embutido para preencher a lista
+lista.setColumns(2); // Deixa os cards em Grid 2x2
+
 ProdutoModel model = new ProdutoModel(); 
 model.bindTo(lista);
-model.setItems(meusDados);
+model.setItems(meusProdutosDoBanco); // Mágica acontece aqui!
 ```
 
 ## 5. CardLoading
-Bloqueia a tela temporariamente com um *Spinner* gerenciando a Thread Principal para evitar que sua interface congele.
-- `execute(Component parent, String msg, Runnable inBackground, Runnable onUI)`
+Bloqueia a tela temporariamente com um *Spinner* gerenciando a Thread Principal para evitar que sua interface congele. Possui 3 formas de uso:
 
 ```java
-CardLoading.execute(this, "Processando...", 
-    () -> { Thread.sleep(3000); /* DB Insert */ },
-    () -> { CardToast.showSuccess(this, "Pronto!"); }
+// Forma 1: Sem mensagem, apenas bloqueio rápido
+CardLoading.execute(this, () -> { carregarRelatorio(); });
+
+// Forma 2: Com mensagem de espera
+CardLoading.execute(this, "Processando...", () -> { processarArquivo(); });
+
+// Forma 3: Com mensagem e Callback (Executa algo na UI após terminar)
+CardLoading.execute(this, "Salvando Banco...", 
+    () -> { Thread.sleep(3000); /* DB Insert pesado em Background */ },
+    () -> { CardToast.showSuccess(this, "Pronto!"); /* Roda na Thread da UI! */ }
 );
 ```
 
 ## 6. CardToast
-Mensagem pop-up temporária (Snackbar) no canto da tela.
-- `showSuccess(Component, String)`
-- `showError(...)`, `showWarning(...)`, `showInfo(...)`
+Mensagem pop-up temporária (Snackbar) flutuante no canto da tela. Ideal para feedback rápido.
 
 ```java
+// Variantes de cores e ícones automáticos
 CardToast.showSuccess(this, "Dados salvos com êxito!");
+CardToast.showError(this, "Falha de conexão com o Banco.");
+CardToast.showWarning(this, "Atenção: Licença expirando.");
+CardToast.showInfo(this, "Nova atualização disponível.");
 ```
 
 ## 7. CardDialog
-Substitui o feio `JOptionPane` por Modais fluidas com botão Cancelar/Confirmar.
-- `showConfirm(...)`
-- `showInput(...)`
-- `showComboInput(...)`
+Substitui o antigo `JOptionPane` por Modais modernas, animadas e fluidas.
 
 ```java
-boolean resposta = CardDialog.showConfirm(this, "Aviso", "Apagar tudo?");
+// 1. Confirmação (Sim/Não)
+boolean resposta = CardDialog.showConfirm(this, "Atenção", "Deseja apagar o registro?");
+
+// 2. Entrada de Texto Livre
+String nome = CardDialog.showInput(this, "Novo Cliente", "Digite o nome:");
+
+// 3. Entrada com Seleção (Dropdown)
+String estado = CardDialog.showComboInput(this, "Região", "Selecione a UF:", new String[]{"SP", "RJ", "MG"});
 ```
 
 ## 8. CardPanel
@@ -324,14 +375,17 @@ statusInfo.addStatus("Conexões", "Aativas", Color.GREEN);
 ```
 
 ## 28. CardAvatar
-Container que aplica o *Crop* (Máscara Redonda Perfeita) de Fotos de Perfil de Usuários.
-- `setImagePath(String)`
-- `setInitials(String)`
-- `setShowOnlineDot(boolean)`
+Container que aplica o *Crop* (Máscara Redonda Perfeita) para Fotos de Perfil. Possui fallback para iniciais.
 
 ```java
 CardAvatar perfil = new CardAvatar();
+perfil.setShowOnlineDot(true); // Exibe bolinha verde de "Online"
+
+// Forma 1: Carregando uma foto do disco
 perfil.setImagePath("C:\\foto.jpg");
+
+// Forma 2: Quando o usuário não tem foto, gera Iniciais coloridas automaticamente
+perfil.setInitials("JS"); // Gera um círculo com "JS" centralizado
 ```
 
 ## 29. CardImage
@@ -354,14 +408,16 @@ tabs.addTab("Geral", panelGeral);
 ```
 
 ## 31. CardProgress
-Barra de progresso interativa com diversos designs luxuosos.
-- `setProgress(int)`
-- `setModel(ProgressModel)`
+Barra de progresso interativa com diversos designs luxuosos embutidos.
 
 ```java
 CardProgress proc = new CardProgress();
-proc.setModel(CardProgress.ProgressModel.CIRCULAR);
 proc.setProgress(70);
+
+// Mude a aparência instantaneamente:
+proc.setModel(CardProgress.ProgressModel.LINEAR); // Barra reta grossa
+proc.setModel(CardProgress.ProgressModel.LINEAR_SLIM); // Linha minimalista
+proc.setModel(CardProgress.ProgressModel.CIRCULAR); // Velocímetro
 ```
 
 ## 32. CardSkeleton
