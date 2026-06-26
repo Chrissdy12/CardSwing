@@ -16,6 +16,7 @@ public class CardAvatar extends JPanel implements Serializable {
 
     private String initials = "CH";
     private String imagePath = "";
+    private Icon icon;
     private Image avatarImage;
     private Color avatarColor = new Color(59, 130, 246);
     private Color textColor = Color.WHITE;
@@ -40,40 +41,55 @@ public class CardAvatar extends JPanel implements Serializable {
         Graphics2D g2 = (Graphics2D) g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-        int d = avatarSize;
-        Shape circle = new Ellipse2D.Float(2, 2, d, d);
+        int w = getWidth();
+        int h = getHeight();
+        int d = Math.max(10, Math.min(w, h) - 4); // Calcula o diâmetro disponível
+        int cx = (w - d) / 2; // Centraliza X
+        int cy = (h - d) / 2; // Centraliza Y
+
+        Shape circle = new Ellipse2D.Float(cx, cy, d, d);
 
         if (avatarImage != null) {
-            g2.setClip(circle);
-            // Desenha a imagem preenchendo o círculo (crop center simplificado)
+            java.awt.image.BufferedImage maskImage = new java.awt.image.BufferedImage(d, d, java.awt.image.BufferedImage.TYPE_INT_ARGB);
+            Graphics2D gMask = maskImage.createGraphics();
+            gMask.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+            gMask.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+            
+            gMask.setColor(Color.BLACK);
+            gMask.fillOval(0, 0, d, d);
+            
+            gMask.setComposite(AlphaComposite.SrcIn);
+            
             int imgW = avatarImage.getWidth(null);
             int imgH = avatarImage.getHeight(null);
             if (imgW > 0 && imgH > 0) {
                 float scale = Math.max((float) d / imgW, (float) d / imgH);
                 int nw = (int) (imgW * scale);
                 int nh = (int) (imgH * scale);
-                int nx = 2 + (d - nw) / 2;
-                int ny = 2 + (d - nh) / 2;
-                g2.drawImage(avatarImage, nx, ny, nw, nh, null);
+                int nx = (d - nw) / 2;
+                int ny = (d - nh) / 2;
+                gMask.drawImage(avatarImage, nx, ny, nw, nh, null);
             }
-            g2.setClip(null);
+            gMask.dispose();
+            
+            g2.drawImage(maskImage, cx, cy, null);
         } else {
             g2.setColor(avatarColor);
             g2.fill(circle);
             if (initials != null && !initials.isEmpty()) {
                 g2.setColor(textColor);
-                g2.setFont(new Font("Segoe UI", Font.BOLD, d / 2));
+                g2.setFont(new Font("Segoe UI", Font.BOLD, Math.max(8, d / 2)));
                 FontMetrics fm = g2.getFontMetrics();
-                int tx = 2 + (d - fm.stringWidth(initials)) / 2;
-                int ty = 2 + (d - fm.getHeight()) / 2 + fm.getAscent();
+                int tx = cx + (d - fm.stringWidth(initials)) / 2;
+                int ty = cy + (d - fm.getHeight()) / 2 + fm.getAscent();
                 g2.drawString(initials, tx, ty);
             }
         }
 
         if (showOnlineDot) {
             int dotSize = Math.max(10, d / 4);
-            int dx = 2 + d - dotSize + 2; // offset for border
-            int dy = 2 + d - dotSize;
+            int dx = cx + d - dotSize;
+            int dy = cy + d - dotSize;
             
             // Borda branca do dot
             g2.setColor(Color.WHITE);
@@ -102,9 +118,39 @@ public class CardAvatar extends JPanel implements Serializable {
                 avatarImage = ImageIO.read(new File(imagePath));
             } else {
                 avatarImage = null;
+                if (this.icon != null) {
+                    setIcon(this.icon);
+                    return;
+                }
             }
         } catch (Exception e) {
             avatarImage = null;
+            if (this.icon != null) {
+                setIcon(this.icon);
+                return;
+            }
+        }
+        repaint();
+    }
+
+    public Icon getIcon() { return icon; }
+    public void setIcon(Icon icon) {
+        this.icon = icon;
+        if (icon instanceof ImageIcon) {
+            this.avatarImage = ((ImageIcon) icon).getImage();
+        } else if (icon != null) {
+            java.awt.image.BufferedImage bi = new java.awt.image.BufferedImage(
+                icon.getIconWidth(), icon.getIconHeight(), java.awt.image.BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = bi.createGraphics();
+            icon.paintIcon(this, g, 0, 0);
+            g.dispose();
+            this.avatarImage = bi;
+        } else {
+            this.avatarImage = null;
+            if (this.imagePath != null && !this.imagePath.isEmpty()) {
+                setImagePath(this.imagePath);
+                return;
+            }
         }
         repaint();
     }

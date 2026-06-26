@@ -18,7 +18,7 @@ public class CardImageBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardImage");
+        return CardSwingIcons.getIconFor("CardImage");
     }
 
     @Override
@@ -42,14 +42,14 @@ public class CardImageBeanInfo extends SimpleBeanInfo {
                 "borderColor", "chartColor", "chartType", "colors", "focusColor", "gridColor",
                 "headerColor", "headerTextColor", "items", "labels", "localDate", "localDateTime",
                 "onButtonClick", "onCardClick", "onScrollEnd", "onSearch", "placeholder", "radius",
-                "rowHoverColor", "showGrid", "titlePosition", "unselectedTextColor", "values"
+                "rowHoverColor", "showGrid", "titlePosition", "unselectedTextColor", "values", "roundedCorners"
             };
 
             for (String propName : customProps) {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardImage.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardImage Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

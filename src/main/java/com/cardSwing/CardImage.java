@@ -10,14 +10,18 @@ import javax.swing.*;
 /**
  * Área de imagem do Card — exibe uma imagem com cantos arredondados.
  *
- * <p><b>PALETTE:</b> Arraste para dentro de um CardPanel.</p>
+ * <p>
+ * <b>PALETTE:</b> Arraste para dentro de um CardPanel.
+ * </p>
  *
- * <p>Propriedades editáveis:</p>
+ * <p>
+ * Propriedades editáveis:
+ * </p>
  * <ul>
- *   <li><b>imagePath</b> — caminho do arquivo de imagem</li>
- *   <li><b>imageHeight</b> — altura da área de imagem</li>
- *   <li><b>imageRadius</b> — raio dos cantos</li>
- *   <li><b>placeholderColor</b> — cor quando sem imagem</li>
+ * <li><b>imagePath</b> — caminho do arquivo de imagem</li>
+ * <li><b>imageHeight</b> — altura da área de imagem</li>
+ * <li><b>imageRadius</b> — raio dos cantos</li>
+ * <li><b>placeholderColor</b> — cor quando sem imagem</li>
  * </ul>
  */
 public class CardImage extends JPanel implements Serializable {
@@ -27,6 +31,8 @@ public class CardImage extends JPanel implements Serializable {
     private String imagePath = "";
     private int imageHeight = 120;
     private int imageRadius = 8;
+    private boolean roundedCorners = true;
+    private Icon icon;
     private Color placeholderColor = new Color(241, 245, 249);
     private transient BufferedImage loadedImage;
 
@@ -57,23 +63,42 @@ public class CardImage extends JPanel implements Serializable {
         int w = getWidth();
         int h = getHeight();
 
-        // Clip arredondado
-        g2.setClip(new java.awt.geom.RoundRectangle2D.Float(0, 0, w, h, imageRadius, imageRadius));
-
         if (loadedImage != null) {
             // Desenha imagem redimensionada (cover)
             double scaleX = (double) w / loadedImage.getWidth();
             double scaleY = (double) h / loadedImage.getHeight();
             double scale = Math.max(scaleX, scaleY);
-            int drawW = (int)(loadedImage.getWidth() * scale);
-            int drawH = (int)(loadedImage.getHeight() * scale);
+            int drawW = (int) (loadedImage.getWidth() * scale);
+            int drawH = (int) (loadedImage.getHeight() * scale);
             int drawX = (w - drawW) / 2;
             int drawY = (h - drawH) / 2;
-            g2.drawImage(loadedImage, drawX, drawY, drawW, drawH, null);
+
+            if (roundedCorners) {
+                java.awt.image.BufferedImage maskImage = new java.awt.image.BufferedImage(w, h,
+                        java.awt.image.BufferedImage.TYPE_INT_ARGB);
+                Graphics2D gMask = maskImage.createGraphics();
+                gMask.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                gMask.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+
+                gMask.setColor(Color.BLACK);
+                gMask.fillRoundRect(0, 0, w, h, imageRadius, imageRadius);
+
+                gMask.setComposite(AlphaComposite.SrcIn);
+                gMask.drawImage(loadedImage, drawX, drawY, drawW, drawH, null);
+                gMask.dispose();
+
+                g2.drawImage(maskImage, 0, 0, null);
+            } else {
+                g2.drawImage(loadedImage, drawX, drawY, drawW, drawH, null);
+            }
         } else {
             // Placeholder
             g2.setColor(placeholderColor);
-            g2.fillRect(0, 0, w, h);
+            if (roundedCorners) {
+                g2.fillRoundRect(0, 0, w, h, imageRadius, imageRadius);
+            } else {
+                g2.fillRect(0, 0, w, h);
+            }
             // Ícone de imagem
             g2.setColor(new Color(148, 163, 184));
             g2.setFont(new Font("Segoe UI", Font.PLAIN, 13));
@@ -89,8 +114,34 @@ public class CardImage extends JPanel implements Serializable {
 
     // === PROPRIEDADES ===
 
+    public Icon getIcon() {
+        return icon;
+    }
+
+    public void setIcon(Icon icon) {
+        Icon old = this.icon;
+        this.icon = icon;
+        firePropertyChange("icon", old, this.icon);
+        loadImage();
+        repaint();
+    }
+
+    public boolean isRoundedCorners() {
+        return roundedCorners;
+    }
+
+    public void setRoundedCorners(boolean roundedCorners) {
+        boolean old = this.roundedCorners;
+        this.roundedCorners = roundedCorners;
+        firePropertyChange("roundedCorners", old, this.roundedCorners);
+        repaint();
+    }
+
     /** Caminho do arquivo de imagem. */
-    public String getImagePath() { return imagePath; }
+    public String getImagePath() {
+        return imagePath;
+    }
+
     public void setImagePath(String imagePath) {
         String old = this.imagePath;
         this.imagePath = imagePath != null ? imagePath : "";
@@ -100,7 +151,10 @@ public class CardImage extends JPanel implements Serializable {
     }
 
     /** Altura da área de imagem. */
-    public int getImageHeight() { return imageHeight; }
+    public int getImageHeight() {
+        return imageHeight;
+    }
+
     public void setImageHeight(int imageHeight) {
         int old = this.imageHeight;
         this.imageHeight = Math.max(20, imageHeight);
@@ -110,7 +164,10 @@ public class CardImage extends JPanel implements Serializable {
     }
 
     /** Raio dos cantos arredondados. */
-    public int getImageRadius() { return imageRadius; }
+    public int getImageRadius() {
+        return imageRadius;
+    }
+
     public void setImageRadius(int imageRadius) {
         int old = this.imageRadius;
         this.imageRadius = Math.max(0, imageRadius);
@@ -119,7 +176,10 @@ public class CardImage extends JPanel implements Serializable {
     }
 
     /** Cor de fundo quando sem imagem. */
-    public Color getPlaceholderColor() { return placeholderColor; }
+    public Color getPlaceholderColor() {
+        return placeholderColor;
+    }
+
     public void setPlaceholderColor(Color placeholderColor) {
         Color old = this.placeholderColor;
         this.placeholderColor = placeholderColor;
@@ -128,7 +188,18 @@ public class CardImage extends JPanel implements Serializable {
     }
 
     private void loadImage() {
-        if (imagePath != null && !imagePath.isEmpty()) {
+        if (icon instanceof ImageIcon) {
+            Image img = ((ImageIcon) icon).getImage();
+            loadedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = loadedImage.createGraphics();
+            g.drawImage(img, 0, 0, null);
+            g.dispose();
+        } else if (icon != null) {
+            loadedImage = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
+            Graphics2D g = loadedImage.createGraphics();
+            icon.paintIcon(this, g, 0, 0);
+            g.dispose();
+        } else if (imagePath != null && !imagePath.isEmpty()) {
             try {
                 loadedImage = ImageIO.read(new File(imagePath));
             } catch (Exception e) {

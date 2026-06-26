@@ -17,7 +17,7 @@ public class CardGraficBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardGrafic"); // Fallback to a default if missing
+        return CardSwingIcons.getIconFor("CardGrafic"); // Fallback to a default if missing
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CardGraficBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardGrafic.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardGrafic Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

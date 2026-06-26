@@ -17,7 +17,7 @@ public class CardComboBoxBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardComboBox");
+        return CardSwingIcons.getIconFor("CardComboBox");
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CardComboBoxBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardComboBox.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardComboBox Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

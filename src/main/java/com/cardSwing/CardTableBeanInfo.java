@@ -15,7 +15,7 @@ public class CardTableBeanInfo extends SimpleBeanInfo {
 
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardTable");
+        return CardSwingIcons.getIconFor("CardTable");
     }
 
     @Override
@@ -25,9 +25,9 @@ public class CardTableBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor headerTextColor = new PropertyDescriptor("headerTextColor", CardTable.class);
             PropertyDescriptor rowHoverColor = new PropertyDescriptor("rowHoverColor", CardTable.class);
             
-            headerColor.setValue("category", "CardMury Configs");
-            headerTextColor.setValue("category", "CardMury Configs");
-            rowHoverColor.setValue("category", "CardMury Configs");
+            headerColor.setValue("category", "CardTable Configs");
+            headerTextColor.setValue("category", "CardTable Configs");
+            rowHoverColor.setValue("category", "CardTable Configs");
 
             PropertyDescriptor[] props = {headerColor, headerTextColor, rowHoverColor};
             for (PropertyDescriptor pd : props) {

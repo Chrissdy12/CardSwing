@@ -172,5 +172,15 @@ public class CardTable extends JScrollPane implements Serializable {
     public void setHeaderTextColor(Color headerTextColor) { this.headerTextColor = headerTextColor; repaint(); }
     
     public Color getRowHoverColor() { return rowHoverColor; }
-    public void setRowHoverColor(Color rowHoverColor) { this.rowHoverColor = rowHoverColor; repaint(); }
+    public void setRowHoverColor(Color rowHoverColor) {
+        this.rowHoverColor = rowHoverColor;
+        repaint();
+    }
+
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        if (table != null) table.setBackground(bg);
+        if (getViewport() != null) getViewport().setBackground(bg);
+    }
 }

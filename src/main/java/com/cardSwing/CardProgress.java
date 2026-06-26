@@ -22,6 +22,16 @@ public class CardProgress extends JPanel implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    public enum ProgressModel {
+        STANDARD,
+        STRIPED,
+        GRADIENT,
+        DASHED,
+        OUTLINED,
+        MATERIAL
+    }
+
+    private ProgressModel model = ProgressModel.STANDARD;
     private int progress = 50;
     private int currentValue = 50;
     private int totalValue = 100;
@@ -50,15 +60,72 @@ public class CardProgress extends JPanel implements Serializable {
                 int w = getWidth(), h = getHeight();
                 int y = (h - barHeight) / 2;
 
-                // Trilho
-                g2.setColor(trackColor);
-                g2.fillRoundRect(0, y, w, barHeight, barHeight, barHeight);
-
-                // Barra preenchida
                 int fillW = (int)((progress / 100.0) * w);
-                if (fillW > 0) {
-                    g2.setColor(barColor);
-                    g2.fillRoundRect(0, y, fillW, barHeight, barHeight, barHeight);
+
+                switch (model) {
+                    case STRIPED:
+                        g2.setColor(trackColor);
+                        g2.fillRoundRect(0, y, w, barHeight, barHeight, barHeight);
+                        if (fillW > 0) {
+                            g2.setClip(new java.awt.geom.RoundRectangle2D.Float(0, y, fillW, barHeight, barHeight, barHeight));
+                            g2.setColor(barColor);
+                            g2.fillRoundRect(0, y, fillW, barHeight, barHeight, barHeight);
+                            g2.setColor(new Color(255, 255, 255, 50));
+                            g2.setStroke(new BasicStroke(Math.max(1f, barHeight / 2.0f)));
+                            for (int i = -barHeight * 2; i < fillW; i += barHeight) {
+                                g2.drawLine(i, y + barHeight, i + barHeight * 2, y - barHeight);
+                            }
+                            g2.setClip(null);
+                        }
+                        break;
+                    case GRADIENT:
+                        g2.setColor(trackColor);
+                        g2.fillRoundRect(0, y, w, barHeight, barHeight, barHeight);
+                        if (fillW > 0) {
+                            GradientPaint gp = new GradientPaint(0, y, barColor.brighter().brighter(), fillW, y, barColor);
+                            g2.setPaint(gp);
+                            g2.fillRoundRect(0, y, fillW, barHeight, barHeight, barHeight);
+                        }
+                        break;
+                    case DASHED:
+                        g2.setColor(trackColor);
+                        g2.fillRoundRect(0, y, w, barHeight, barHeight, barHeight);
+                        if (fillW > 0) {
+                            g2.setClip(new java.awt.geom.RoundRectangle2D.Float(0, y, fillW, barHeight, barHeight, barHeight));
+                            g2.setColor(barColor);
+                            int dashWidth = Math.max(4, barHeight / 2);
+                            int dashSpace = Math.max(2, dashWidth / 2);
+                            for (int i = 0; i < fillW; i += dashWidth + dashSpace) {
+                                g2.fillRect(i, y, dashWidth, barHeight);
+                            }
+                            g2.setClip(null);
+                        }
+                        break;
+                    case OUTLINED:
+                        g2.setColor(trackColor);
+                        g2.drawRoundRect(0, y, w - 1, barHeight - 1, barHeight, barHeight);
+                        if (fillW > 4) {
+                            g2.setColor(barColor);
+                            g2.fillRoundRect(2, y + 2, fillW - 4, barHeight - 4, barHeight - 4, barHeight - 4);
+                        }
+                        break;
+                    case MATERIAL:
+                        g2.setColor(trackColor);
+                        g2.fillRect(0, y, w, barHeight);
+                        if (fillW > 0) {
+                            g2.setColor(barColor);
+                            g2.fillRect(0, y, fillW, barHeight);
+                        }
+                        break;
+                    case STANDARD:
+                    default:
+                        g2.setColor(trackColor);
+                        g2.fillRoundRect(0, y, w, barHeight, barHeight, barHeight);
+                        if (fillW > 0) {
+                            g2.setColor(barColor);
+                            g2.fillRoundRect(0, y, fillW, barHeight, barHeight, barHeight);
+                        }
+                        break;
                 }
                 g2.dispose();
             }
@@ -85,6 +152,14 @@ public class CardProgress extends JPanel implements Serializable {
     }
 
     // === PROPRIEDADES ===
+
+    public ProgressModel getModel() { return model; }
+    public void setModel(ProgressModel model) {
+        ProgressModel old = this.model;
+        this.model = model;
+        firePropertyChange("model", old, model);
+        repaint();
+    }
 
     public boolean isShowPercentage() { return showPercentage; }
     public void setShowPercentage(boolean showPercentage) {

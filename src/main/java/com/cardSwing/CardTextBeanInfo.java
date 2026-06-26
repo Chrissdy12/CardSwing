@@ -18,7 +18,7 @@ public class CardTextBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardText");
+        return CardSwingIcons.getIconFor("CardText");
     }
 
     @Override
@@ -49,7 +49,7 @@ public class CardTextBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardText.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardText Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

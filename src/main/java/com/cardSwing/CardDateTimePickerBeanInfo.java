@@ -17,7 +17,7 @@ public class CardDateTimePickerBeanInfo extends SimpleBeanInfo {
 
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardDateTimePicker");
+        return CardSwingIcons.getIconFor("CardDateTimePicker");
     }
 
     @Override
@@ -48,7 +48,7 @@ public class CardDateTimePickerBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardDateTimePicker.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardDateTimePicker Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

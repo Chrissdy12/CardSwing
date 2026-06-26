@@ -15,7 +15,7 @@ public class CardPasswordFieldBeanInfo extends SimpleBeanInfo {
 
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardPasswordField");
+        return CardSwingIcons.getIconFor("CardPasswordField");
     }
 
     @Override
@@ -26,10 +26,10 @@ public class CardPasswordFieldBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor focusColor = new PropertyDescriptor("focusColor", CardPasswordField.class);
             PropertyDescriptor placeholder = new PropertyDescriptor("placeholder", CardPasswordField.class);
             
-            radius.setValue("category", "CardMury Configs");
-            borderColor.setValue("category", "CardMury Configs");
-            focusColor.setValue("category", "CardMury Configs");
-            placeholder.setValue("category", "CardMury Configs");
+            radius.setValue("category", "CardPasswordField Configs");
+            borderColor.setValue("category", "CardPasswordField Configs");
+            focusColor.setValue("category", "CardPasswordField Configs");
+            placeholder.setValue("category", "CardPasswordField Configs");
 
             PropertyDescriptor[] props = {radius, borderColor, focusColor, placeholder};
             for (PropertyDescriptor pd : props) {

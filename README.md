@@ -1,297 +1,325 @@
-<div align="center">
-  <br />
-  <h1>✨ CardSwing UI</h1>
-  <p>
-    <strong>A biblioteca definitiva de componentes modernos e Cards Interativos para Java Swing.</strong>
-  </p>
-  <p>Construa aplicações de desktop que parecem sistemas web modernos, com facilidade de arrastar e soltar diretamente no NetBeans IDE.</p>
-</div>
+# CardSwing Framework 🚀
+
+**CardSwing** é um framework de interface gráfica premium (UI/UX) construído totalmente do zero para **Java Swing**. Ele traz a estética moderna do Material Design e de aplicações Web contemporâneas para o ambiente desktop clássico, suportando temas globais, paleta do NetBeans, cantos arredondados, efeitos hover, sombras dinâmicas e transições suaves.
 
 ---
 
-## 📖 Sumário
-- [📌 O que é o CardSwing?](#-o-que-é-o-cardswing)
-- [🚀 Como Instalar (Dependência Maven)](#-como-instalar-dependência-maven)
-- [🎨 Adicionando à Palette do NetBeans](#-adicionando-à-palette-do-netbeans)
-- [🧩 Componentes Disponíveis e Como Usar](#-componentes-disponíveis-e-como-usar)
-  - [📦 Containers Principais](#-containers-principais)
-    - [CardPanel](#cardpanel)
-    - [CardTabs](#cardtabs)
-    - [CardListPanel](#cardlistpanel)
-    - [CardSkeleton](#cardskeleton)
-  - [🎛️ Componentes de Interação](#️-componentes-de-interação)
-    - [CardSwitch](#cardswitch)
-    - [CardButton](#cardbutton)
-    - [CardCheck](#cardcheck)
-    - [CardTextField](#cardtextfield)
-    - [CardPasswordField](#cardpasswordfield)
-    - [CardComboBox](#cardcombobox)
-    - [CardDatePicker](#carddatepicker)
-    - [CardDateTimePicker](#carddatetimepicker)
-  - [🔔 Alertas e Diálogos](#-alertas-e-diálogos-popups-modernos)
-    - [CardToast](#cardtoast)
-    - [CardDialog](#carddialog)
-  - [🖼️ Dados e Visuais](#️-dados-e-visuais)
-    - [CardTable](#cardtable)
-    - [CardGrafic](#cardgrafic)
-    - [CardAvatar](#cardavatar)
-    - [CardProgress](#cardprogress)
-    - [CardStatusBadge](#cardstatusbadge)
-    - [CardTag](#cardtag)
-    - [CardImage](#cardimage)
-    - [CardSeparator](#cardseparator)
-  - [✍️ Tipografia](#️-tipografia)
-- [💻 Exemplo de Uso Avançado](#-exemplo-de-uso-avançado-cardlistmodel)
-
----
-
-## 📌 O que é o CardSwing?
-O **CardSwing** é uma biblioteca visual de alto nível para Java Swing. Ele resolve o problema histórico do Java Desktop parecer "antigo", trazendo conceitos modernos de design web, como UI Baseada em Cards, Layouts fluidos, Efeito Ripple (Ondinha de Clique), Skeleton Loading (Shimmer) e Botões Toggle (estilo iOS).
-
-Tudo isso 100% integrado à Palette do **Apache NetBeans (Matisse)**: basta arrastar, configurar pelas Propriedades e rodar!
-
-## 🚀 Como instalar (Dependência Maven)
-
-Para utilizar o CardSwing no seu projeto, instale este projeto na sua máquina (`mvn clean install`) e depois adicione a dependência no `pom.xml` do seu projeto principal:
-
-```xml
-<dependency>
-    <groupId>com</groupId>
-    <artifactId>CardSwing</artifactId>
-    <version>1.0</version>
-</dependency>
-```
-
-### 🎨 Adicionando à Palette do NetBeans
-Para que os componentes apareçam na sua janela de design e possam ser arrastados:
-1. No NetBeans, vá em **Tools > Palette > Swing/AWT Components**.
-2. Clique em **New Category...** e crie uma categoria chamada `CardSwing`.
-3. Clique em **Add from Project...**, localize o projeto onde você baixou a biblioteca CardSwing.
-4. Selecione **APENAS as classes de componentes visuais** (veja a lista abaixo) para evitar lixo visual.
-5. Selecione a categoria `CardSwing` e clique em Finish!
-
----
-
-## 🧩 Componentes Disponíveis e Como Usar
-
-Todos os componentes possuem a categoria exclusiva **"CardSwing Configs"** na janela de Propriedades do NetBeans, centralizando tudo que você precisa alterar (Cores, Fontes, Tamanhos).
-
-### 📦 Containers Principais
-<a id="cardpanel"></a>
-- **`CardPanel`:** O coração da biblioteca. Um painel com cantos perfeitamente arredondados, sombra 3D suave, barra de cabeçalho colorida (Theme Color) e suporte a Título com Ícone.
-  - **Exemplo de Uso via Código:**
-    ```java
-    CardPanel painel = new CardPanel();
-    painel.setThemeColor(new Color(59, 130, 246));
-    painel.setCollapsible(true); // Permite sanfonar o card
-    ```
-
-<a id="cardtabs"></a>
-- **`CardTabs`:** Um `JTabbedPane` completamente modernizado. Possui abas limpas com espaçamento respirável, sem bordas pesadas e com um traço inferior animado e colorido na aba ativa (Material Design / Web style).
-  - **Exemplo de Uso:** Basta arrastar pela Palette e adicionar painéis normalmente. O visual premium é automático.
-
-<a id="cardlistpanel"></a>
-- **`CardListPanel`:** Uma lista inteligente que organiza seus Cards automaticamente (Fluida ou em Grid).
-  - **Exemplo de Uso:**
-    ```java
-    CardListPanel listPanel = new CardListPanel();
-    listPanel.setShowSearch(true); // Exibe uma barra de busca no topo
-    listPanel.addCard(new CardPanel()); 
-    listPanel.setOnSearch(texto -> filtrarBusca(texto)); // Callback
-    ```
-
-<a id="cardskeleton"></a>
-- **`CardSkeleton`:** Componente mágico que simula o carregamento. Mostra o formato de um card vazio com um efeito "Shimmer".
-  - **Exemplo de Uso:** Basta arrastar para a tela ou usar no código `painel.add(new CardSkeleton());` enquanto busca dados no banco.
-
-### 🎛️ Componentes de Interação
-<a id="cardswitch"></a>
-- **`CardSwitch`:** Substitui os checkboxes feios por um Toggle moderno (estilo botão do iPhone), com transição suave.
-  - **Exemplo de Uso:**
-    ```java
-    CardSwitch toggle = new CardSwitch();
-    toggle.setChecked(true);
-    toggle.addPropertyChangeListener("checked", evt -> salvar(toggle.isChecked()));
-    ```
-
-<a id="cardbutton"></a>
-- **`CardButton` & `CardButtonRow`:** Botões com cantos arredondados e mudança de cor inteligente. O Row garante espaçamento perfeito lado a lado.
-  - **Exemplo de Uso:**
-    ```java
-    CardButtonRow botoes = new CardButtonRow()
-        .addButton("Salvar", new Color(16, 185, 129), () -> salvar())
-        .addButton("Cancelar", Color.GRAY, () -> cancelar());
-    ```
-
-<a id="cardcheck"></a>
-- **`CardCheck`:** Checkbox minimalista com ícone desenhado à mão.
-  - **Exemplo de Uso:** `CardCheck check = new CardCheck("Aceito os termos");`
-
-<a id="cardtextfield"></a>
-- **`CardTextField`:** Campo de texto moderno com cantos arredondados, padding confortável e anel de foco.
-  - **Exemplo de Uso:**
-    ```java
-    CardTextField txtNome = new CardTextField();
-    txtNome.setPlaceholder("Digite seu nome...");
-    ```
-
-<a id="cardpasswordfield"></a>
-- **`CardPasswordField`:** Idêntico ao TextField, mas preparado para senhas (`***`). Ele já vem com um botão interativo integrado no canto (olho desenhado vetorialmente) que permite mostrar ou ocultar a senha ao ser clicado, incluindo suporte a `placeholder`.
-  - **Exemplo de Uso:** `CardPasswordField txtSenha = new CardPasswordField(); txtSenha.setPlaceholder("Senha secreta");`
-
-<a id="cardcombobox"></a>
-- **`CardComboBox`:** Seletor (Dropdown) de visual limpo e seta de expansão (chevron) discreta.
-  - **Exemplo de Uso:**
-    ```java
-    CardComboBox<String> combo = new CardComboBox<>();
-    combo.addItem("Opção 1");
-    ```
-
-<a id="carddatepicker"></a>
-- **`CardDatePicker`:** Substituto moderno para o antigo `JDateChooser`. É um campo de texto com ícone de calendário. Ao clicar, exibe um PopUp com um calendário interativo e elegante para escolha de dias e meses. Retorna nativamente a API moderna de Datas do Java (`LocalDate`).
-  - **Exemplo de Uso:**
-    ```java
-    CardDatePicker picker = new CardDatePicker();
-    picker.setLocalDate(LocalDate.now());
-    LocalDate dataEscolhida = picker.getLocalDate();
-    ```
-
-<a id="carddatetimepicker"></a>
-- **`CardDateTimePicker`:** Evolução do DatePicker, mas focado na seleção completa de **Data e Hora**. O calendário exibe os seletores de Horas e Minutos acoplados, perfeito para agendamentos. Retorna nativamente o `LocalDateTime`.
-  - **Exemplo de Uso:**
-    ```java
-    CardDateTimePicker dateTimePicker = new CardDateTimePicker();
-    dateTimePicker.setLocalDateTime(LocalDateTime.now());
-    LocalDateTime dataHoraEscolhida = dateTimePicker.getLocalDateTime();
-    ```
-
-### 🔔 Alertas e Diálogos (Popups Modernos)
-<a id="cardtoast"></a>
-- **`CardToast`:** Esqueça o chato `JOptionPane` para mensagens simples. O Toast exibe uma notificação flutuante e animada no canto inferior direito da tela. Ele desliza, tem sombra 3D, ícones desenhados manualmente (sem depender de fontes) e desaparece sozinho após 3 segundos sem travar o aplicativo.
-  - **Exemplo de Uso:**
-    ```java
-    CardToast.showSuccess(this, "Salvo com sucesso!");
-    CardToast.showError(this, "Falha na conexão!");
-    CardToast.showWarning(this, "Estoque baixo.");
-    CardToast.showInfo(this, "Sistema atualizado.");
-    ```
-
-<a id="carddialog"></a>
-- **`CardDialog`:** Substitui os alertas modais intrusivos do Java. Cria um efeito de véu escuro (Backdrop) que cobre toda a janela e traz um Card branco centralizado com bordas altamente arredondadas, ícone ilustrativo vetorial e botões modernos de confirmação.
-  - **Exemplo de Uso:**
-    ```java
-    // Confirmação
-    boolean continuar = CardDialog.showConfirm(this, "Excluir", "Tem certeza?");
-    
-    // Entrada de Texto
-    String nome = CardDialog.showInput(this, "Nome", "Qual o seu nome?");
-    
-    // Entrada com Combo
-    String[] profissoes = {"Dev", "Design"};
-    String profissao = CardDialog.showComboInput(this, "Profissão", "Selecione:", profissoes);
-    ```
-
-### 🖼️ Dados e Visuais
-<a id="cardtable"></a>
-- **`CardTable`:** A tão sonhada tabela com design moderno! Sem linhas de grade (no-grid), espaçamento generoso, hover styles, cor de seleção suave e **Auto-Bind via Reflection**!
-  - **Mágica do Auto-Bind:**
-    ```java
-    // Ao invés de escrever dezenas de linhas configurando DefaultTableModel, basta fazer isso:
-    List<Cliente> clientes = obterClientesDoBanco();
-    cardTable1.bindList(clientes, Cliente.class);
-    // A tabela automaticamente lê as variáveis da classe Cliente e monta as colunas!
-    ```
-
-<a id="cardgrafic"></a>
-- **`CardGrafic`:** Gráficos leves e instantâneos. Possui **17 opções** incríveis: `BAR`, `BAR_MODERN`, `BAR_GRADIENT`, `BAR_GRADIENT_COLORFUL`, `BAR_LOLLIPOP`, `BAR_LOLLIPOP_COLORFUL`, `HORIZONTAL_BAR`, `HORIZONTAL_BAR_MODERN`, `HORIZONTAL_BAR_MODERN_2`, `HORIZONTAL_BAR_GRADIENT`, `HORIZONTAL_BAR_GRADIENT_COLORFUL`, `HORIZONTAL_BAR_LOLLIPOP`, `HORIZONTAL_BAR_LOLLIPOP_COLORFUL`, `LINE`, `AREA`, `PIE`, e `DONUT`.
-  - **Exemplo de Uso Dinâmico (Binding com Expressões Lambda):**
-    ```java
-    // Vincula diretamente uma lista de objetos ao gráfico, sem converter dados manualmente!
-    List<Venda> vendas = List.of(new Venda("Janeiro", 1500), new Venda("Fevereiro", 3200));
-    
-    // Mostrando nomes no eixo X e valores no eixo Y, definindo a cor de cada fatia dinamicamente
-    meuGrafico.setChartType(CardGrafic.ChartType.DONUT);
-    meuGrafico.setItems(vendas, Venda::getMes, Venda::getValor, v -> {
-        return v.getValor() > 2000 ? Color.GREEN : Color.RED; // Vendeu bem? Fica verde!
-    });
-    ```
-
-<a id="cardavatar"></a>
-- **`CardAvatar`:** Exibe imagens de perfil de forma circular perfeita. Se o usuário não tiver foto, ele extrai as iniciais do nome e desenha um fundo colorido automaticamente.
-  - **Exemplo:** `cardAvatar1.setImageOrInitials(null, "João Silva"); // Renderiza um círculo com "JS"`
-
-<a id="cardprogress"></a>
-- **`CardProgress`:** Barra de progresso super estilizada com suporte numérico opcional ao centro.
-  - **Exemplo (Calculando % sozinho):** `cardProgress1.setValue(750, 1500); // Ele preenche 50% sozinho`
-
-<a id="cardstatusbadge"></a>
-- **`CardStatusBadge` & `CardStatusRow`:** Exibem pares de "Chave: Valor" em pequenos quadros coloridos.
-  - **Exemplo de Uso:**
-    ```java
-    CardStatusRow status = new CardStatusRow()
-        .addStatus("Pendente", "5", Color.RED)
-        .addStatus("Pronto", "10", Color.GREEN);
-    ```
-
-<a id="cardtag"></a>
-- **`CardTag`:** Uma pílula redonda para categorias.
-  - **Exemplo de Uso:** `CardTag tag = new CardTag("Novo", Color.BLUE);`
-
-<a id="cardimage"></a>
-- **`CardImage`:** Placeholder arredondado para imagens grandes de produtos.
-  - **Exemplo de Uso:** `card.add(new CardImage(minhaImagemFile));`
-
-<a id="cardseparator"></a>
-- **`CardSeparator`:** Uma linha sutil para separar seções.
-  - **Exemplo de Uso:** `card.add(new CardSeparator());`
-
-### ✍️ Tipografia
-- **`CardTitle`**, **`CardSubtitle`**, e **`CardText`**: Rótulos padronizados utilizando as melhores práticas tipográficas de tamanho e espaçamento.
-  - **Exemplo:** `painel.add(new CardTitle("Faturamento"));`
-
----
-
-## 💻 Exemplo de Uso Avançado (CardListModel)
-
-Em vez de criar dezenas de cards manualmente na tela, você pode usar o **`CardListModel`**! Ele cria os cards dinamicamente baseados na sua lista do Banco de Dados.
+## 🎨 1. Gerenciamento Global de Tema (`CardThemeManager`)
+O recurso mais poderoso do CardSwing. Altera **toda a sua aplicação** (incluindo componentes Swing nativos como `JButton`, `JTable`, e `JScrollPane`) para uma nova paleta de cores moderna.
 
 ```java
-// 1. Crie a regra de como os dados viram Cards
+// Tipos disponíveis: LIGHT, DARK, MIDNIGHT, FOREST, SUNSET
+CardThemeManager.applyTheme(CardThemeManager.CardTheme.DARK);
+
+// DICA: Chame isso logo no construtor do seu JFrame principal, 
+// antes do initComponents() ou logo após ele.
+```
+
+---
+
+## 📊 2. Gráficos Modernos (`CardGrafic`)
+O `CardGrafic` é altamente flexível e desenha gráficos vetoriais nativos.
+
+### Exemplo A: Gráfico de Barras / Linhas / Área (Cartesiano)
+```java
+CardGrafic graficoCartesiano = new CardGrafic();
+graficoCartesiano.setChartColor(new Color(59, 130, 246)); // Azul
+graficoCartesiano.setShowGrid(true);
+graficoCartesiano.setShowLabels(true);
+
+// Preenchendo os dados (Ex: Faturamento mensal)
+graficoCartesiano.setValues(Arrays.asList(1500.0, 2300.0, 1800.0, 3200.0));
+graficoCartesiano.setLabels(Arrays.asList("Jan", "Fev", "Mar", "Abr"));
+
+// Modelos Modernos disponíveis para Cartesiano:
+// BAR, BAR_MODERN, BAR_GRADIENT, BAR_LOLLIPOP
+// HORIZONTAL_BAR, HORIZONTAL_BAR_MODERN, HORIZONTAL_BAR_GRADIENT, HORIZONTAL_BAR_LOLLIPOP
+// LINE, LINE_SMOOTH (Curva Suave), AREA, AREA_SMOOTH, AREA_SMOOTH_GRADIENT (Fundo com Fade out)
+graficoCartesiano.setChartType(CardGrafic.ChartType.AREA_SMOOTH_GRADIENT);
+```
+
+### Exemplo B: Gráfico de Rosca / Torta / Velocímetro
+```java
+CardGrafic graficoPizza = new CardGrafic();
+graficoPizza.setChartColor(new Color(249, 115, 22)); // Laranja
+
+// Preenchendo os dados proporcionais
+graficoPizza.setValues(Arrays.asList(40.0, 30.0, 20.0, 10.0));
+graficoPizza.setLabels(Arrays.asList("Aprovados", "Pendentes", "Recusados", "Outros"));
+
+// Modelos disponíveis: PIE, DONUT, DONUT_ROUNDED, GAUGE
+graficoPizza.setChartType(CardGrafic.ChartType.DONUT_ROUNDED);
+```
+
+---
+
+## 📋 3. Tabelas e Listagens
+
+### `CardTable` (Tabela Moderna Flat)
+Remove as bordas nativas do Java, aumenta o espaçamento das linhas e adiciona efeito *Hover*.
+
+```java
+CardTable minhaTabela = new CardTable();
+minhaTabela.setRowHeight(40);
+minhaTabela.setRowHoverColor(new Color(241, 245, 249)); // Efeito Hover
+
+// Como preencher a Tabela:
+DefaultTableModel model = new DefaultTableModel(
+    new Object[]{"ID", "Nome", "Status"}, 0 // Colunas
+);
+model.addRow(new Object[]{1, "João Silva", "Ativo"});
+model.addRow(new Object[]{2, "Maria Costa", "Pendente"});
+minhaTabela.setModel(model);
+```
+
+### `CardListPanel` e `CardListModel` (Listas de Cards)
+Substituto do `JList`. Cria uma lista de Cards vertical ou horizontal (Grid) scrollável usando uma arquitetura baseada em `Model` e `Binding`.
+
+**1. Crie o seu Modelo de Dados (`CardListModel`)**
+```java
 public class ProdutoModel extends CardListModel<Produto> {
     @Override
     protected void configureCard(Produto p, CardPanel card) {
-        card.setThemeColor(new Color(59, 130, 246));
+        card.setThemeColor(new Color(59, 130, 246)); // Borda azul lateral
         
-        // Adiciona um Avatar e Título
-        JPanel header = new JPanel(new FlowLayout(FlowLayout.LEFT));
-        header.setOpaque(false);
-        header.add(new CardAvatar("PR")); // Avatar com iniciais
-        header.add(new CardTitle(p.getNome()));
-        
-        card.add(header);
+        card.add(new CardTitle(p.getNome()));
+        card.add(new CardSubtitle(p.getCategoria()));
         card.add(new CardSeparator());
         
+        // Utilitários de status
         card.add(new CardStatusRow()
-            .addStatus("Estoque", p.getQtd() + " unid.", Color.GRAY)
-            .addStatus("Preço", "R$ " + p.getPreco(), new Color(16, 185, 129)));
+            .addStatus("Estoque", String.valueOf(p.getEstoque()), new Color(16, 185, 129))); // Verde
             
+        card.add(new CardSeparator());
+        
+        // Botões dentro do card
         card.add(new CardButtonRow()
-            .addButton("Editar", Color.BLUE, () -> fireButtonClick(p)));
+            .addButton("Editar", new Color(59, 130, 246), () -> fireButtonClick(p)));
     }
 }
-
-// 2. Na sua tela (onde você arrastou o CardListPanel):
-ProdutoModel model = new ProdutoModel();
-model.bindTo(meuCardListPanel);
-
-// Se quiser loading, limpe a lista e jogue uns Skeletons:
-// meuCardListPanel.addCard(new CardSkeleton());
-
-// Quando a busca no banco terminar, injete os dados reais:
-model.setItems(meusProdutos);
-
-// Capturar eventos:
-model.setOnButtonClick(produto -> abrirTelaEdicao(produto));
-meuCardListPanel.setOnSearch(textoDigitado -> refazerBusca(textoDigitado));
 ```
 
+**2. Use o painel na sua tela:**
+```java
+CardListPanel listaProdutos = new CardListPanel();
+listaProdutos.setColumns(2); // 2 colunas = Grid de produtos!
+
+ProdutoModel model = new ProdutoModel();
+model.bindTo(listaProdutos); // Conecta a tela com os dados
+model.setItems(listaVindaDoBanco);
+
+// Ouvindo cliques:
+model.setOnCardClick(produto -> abrirDetalhe(produto));
+model.setOnButtonClick(produto -> editarProduto(produto));
+```
+
+---
+
+## ⚡ 4. Threads, Notificações e PopUps
+
+### `CardLoading` (Travamento Seguro de Tela)
+Mostra um spinner de carregamento gerenciando as *Threads* para que a animação não trave.
+```java
+CardLoading.execute(this, "Validando dados...", 
+    () -> {
+        // TAREFA PESADA [Fundo]: Consultas DB, Threads longas...
+        Thread.sleep(3000); 
+    },
+    () -> {
+        // FINALIZAÇÃO [UI Thread]: Executado ao terminar (Ex: recarregar tabela)
+        CardToast.showSuccess(this, "Pronto!");
+    }
+);
+```
+
+### `CardToast`
+Notificações flutuantes temporárias.
+```java
+CardToast.showSuccess(this, "Operação concluída!");
+CardToast.showError(this, "Erro de conexão!");
+CardToast.showWarning(this, "Preencha todos os campos.");
+CardToast.showInfo(this, "Atualização em andamento...");
+```
+
+### `CardDialog` (Modais Customizados)
+Substituto moderno para o `JOptionPane`. Exibe caixas de diálogo super polidas e fluidas.
+```java
+// 1. Confirmação (Sim/Não)
+boolean confirmou = CardDialog.showConfirm(this, "Deletar", "Tem certeza que deseja apagar o registro?");
+
+// 2. Input Simples
+String nome = CardDialog.showInput(this, "Nome do Projeto", "Digite o novo nome:");
+
+// 3. Input com ComboBox (Opções)
+String[] opcoes = {"Administrador", "Vendedor", "Caixa"};
+String nivel = CardDialog.showComboInput(this, "Cargo", "Escolha a permissão:", opcoes);
+```
+
+---
+
+## 🧩 5. Containers e Tipografia
+
+### `CardPanel`
+Container arredondado com suporte a sombras profundas e interatividade (Hover effect).
+```java
+CardPanel painel = new CardPanel();
+painel.setRadius(20);          // Cantos arredondados
+painel.setShadowEnabled(true); // Sombra 3D
+painel.setHoverEnabled(true);  // Interatividade ao passar o mouse
+painel.setTitle("Dados do Cliente"); // Possui título nativo embutido!
+```
+
+### `CardTitle`, `CardSubtitle`, e `CardText`
+Labels especializados de texto com pesos de fonte corporativos pré-definidos (H1, H2, Paragraph).
+```java
+CardTitle titulo = new CardTitle("Painel Principal");
+CardSubtitle subtitulo = new CardSubtitle("Gerencie suas estatísticas aqui.");
+CardText descricao = new CardText("Os números mostrados referem-se aos últimos 30 dias de processamento.");
+```
+
+### `CardSeparator`
+Um divisor horizontal/vertical elegante.
+```java
+CardSeparator linha = new CardSeparator();
+// Estilos: SOLID, DASHED, DOTTED, GRADIENT, SHADOW
+linha.setStyle(CardSeparator.SeparatorStyle.GRADIENT);
+```
+
+---
+
+## 📝 6. Campos de Entrada (Inputs)
+
+### `CardTextField` e `CardPasswordField`
+Campos de texto com *Focus Ring* colorido e suporte a placeholder.
+```java
+CardTextField txtNome = new CardTextField();
+txtNome.setPlaceholder("Digite seu nome completo...");
+txtNome.setThemeColor(new Color(59, 130, 246)); // Cor da barra de foco (Azul)
+
+CardPasswordField txtSenha = new CardPasswordField();
+txtSenha.setPlaceholder("Sua senha secreta...");
+```
+
+### `CardComboBox`
+Um ComboBox (Select dropdown) moderno.
+```java
+CardComboBox combo = new CardComboBox();
+combo.addItem("Opção 1");
+combo.addItem("Opção 2");
+```
+
+### `CardButton` e `CardButtonRow`
+```java
+CardButton btn = new CardButton();
+btn.setText("Confirmar");
+btn.setButtonRadius(20); // Botão estilo Pílula
+
+// CardButtonRow é útil para alinhar vários botões horizontalmente na base da tela
+CardButtonRow grupoBotoes = new CardButtonRow();
+grupoBotoes.add(new CardButton("Cancelar"));
+grupoBotoes.add(btn);
+```
+
+---
+
+## 📅 7. Datas e Calendários
+
+### `CardCalendar`
+O calendário interativo visual (Perfeito para Dashboards).
+```java
+CardCalendar calendario = new CardCalendar();
+
+// Pegar a data clicada pelo usuário:
+LocalDate dataEscolhida = calendario.getLocalDate();
+
+// Navegar o calendário programaticamente:
+calendario.setLocalDate(LocalDate.now().plusMonths(1));
+```
+
+### `CardDatePicker` e `CardDateTimePicker`
+Inputs de texto com formatação que abrem o calendário como um PopUp flutuante ao clicar no ícone direito.
+```java
+CardDatePicker datePicker = new CardDatePicker();
+LocalDate nascimento = datePicker.getSelectedDate(); 
+
+CardDateTimePicker dateTimePicker = new CardDateTimePicker();
+LocalDateTime agendamento = dateTimePicker.getSelectedDateTime();
+```
+
+---
+
+## 🏷️ 8. Tags, Filtros e Checkboxes
+
+### `CardSwitch` e `CardCheck`
+O `CardSwitch` é um toggle responsivo (estilo iOS/Android).
+```java
+CardSwitch toggleAndroid = new CardSwitch();
+toggleAndroid.setTrackOnColor(new Color(59, 130, 246)); // Azul ativo
+boolean ligado = toggleAndroid.isSelected();
+```
+
+### `CardChip` (Filtros Removíveis)
+Possui um botão **X** no lado direito, perfeito para campo de Filtros. Ele se auto-remove da tela ao ser clicado.
+```java
+CardChip chipFiltro = new CardChip("Estoque: Disponível");
+chipFiltro.addActionListener(e -> {
+    System.out.println("O usuário removeu esse filtro, recarregue a tabela!");
+});
+```
+
+### `CardBadge` (Notificação)
+Pequeno círculo de notificação. Pode ser colado ao lado de botões ou imagens de perfil.
+```java
+CardBadge badge = new CardBadge();
+badge.setText("99+");
+badge.setBadgeColor(new Color(239, 68, 68)); // Vermelho alerta
+```
+
+### `CardTag`, `CardStatusBadge` e `CardStatusRow`
+- `CardTag`: Rótulo de status fixo (Ex: verde para "Concluído").
+- `CardStatusBadge`: Uma Tag moderna com efeito de luz sutil de status.
+- `CardStatusRow`: Painel auto-organizado para dispor várias Tags lado a lado.
+
+---
+
+## 🖼️ 9. Mídia, Abas e Efeitos
+
+### `CardAvatar` e `CardImage`
+- `CardAvatar`: Para fotos de perfil com recorte circular impecável (*Crop*).
+- `CardImage`: Container genérico para imagens preservando o Aspect-Ratio com bordas arredondadas.
+```java
+CardAvatar fotoPerfil = new CardAvatar();
+fotoPerfil.setImagePath("C:\\fotos\\cliente1.jpg");
+fotoPerfil.setInitials("CH"); // Exibido caso a imagem quebre
+fotoPerfil.setShowOnlineDot(true); // Exibe bolinha verde de online
+```
+
+### `CardTabs`
+Abas de navegação web (Fundo transparente com traço animado no item ativo).
+```java
+CardTabs abas = new CardTabs();
+abas.addTab("Dashboard", painelDash);
+abas.addTab("Relatórios", painelRelatorios);
+```
+
+### `CardProgress`
+```java
+CardProgress progresso = new CardProgress();
+progresso.setProgress(50); // 0 a 100%
+// Estilos: SOLID, STRIPED, GRADIENT, CIRCULAR, DASHED
+progresso.setModel(CardProgress.ProgressModel.CIRCULAR);
+```
+
+### `CardSkeleton` (Shimmer Effect de Carregamento)
+O *Skeleton* cria blocos piscantes que simulam uma tela em carregamento (como visto no YouTube ou LinkedIn).
+```java
+CardSkeleton loadingBlock = new CardSkeleton();
+loadingBlock.playAnimation(); // Começa a piscar
+// ... Após receber os dados ...
+loadingBlock.stopAnimation();
+loadingBlock.setVisible(false);
+```
+
+---
+
+*Arquitetado inteiramente sob as bases puras do Swing para desempenho máximo e design sublime.*

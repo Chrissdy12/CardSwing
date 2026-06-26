@@ -161,7 +161,12 @@ public class CardPanel extends JPanel implements Serializable {
 
         // === FUNDO ===
         RoundRectangle2D bgRect = new RoundRectangle2D.Float(0, 0, w, h, r, r);
-        g2.setColor(hover && hoverEnabled ? new Color(249, 250, 251) : Color.WHITE);
+        Color bg = getBackground();
+        if (hover && hoverEnabled) {
+            g2.setColor(bg.equals(Color.WHITE) ? new Color(249, 250, 251) : bg.brighter());
+        } else {
+            g2.setColor(bg);
+        }
         g2.fill(bgRect);
 
         // === BORDA NORMAL ===
@@ -189,9 +194,29 @@ public class CardPanel extends JPanel implements Serializable {
             if (hasTitle) {
                 int textX = 10;
                 if (titleIcon != null) {
-                    int iconY = (headerHeight - titleIcon.getIconHeight()) / 2;
-                    titleIcon.paintIcon(this, g2, textX, iconY);
-                    textX += titleIcon.getIconWidth() + 8;
+                    int maxIconSize = 24; // Tamanho máximo ideal para o header
+                    int iconW = titleIcon.getIconWidth();
+                    int iconH = titleIcon.getIconHeight();
+                    
+                    if (iconW > 0 && iconH > 0) {
+                        double scale = Math.min(1.0, Math.min((double) maxIconSize / iconW, (double) maxIconSize / iconH));
+                        int drawW = (int) (iconW * scale);
+                        int drawH = (int) (iconH * scale);
+                        int drawY = (headerHeight - drawH) / 2;
+                        
+                        if (titleIcon instanceof ImageIcon) {
+                            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                            Image img = ((ImageIcon) titleIcon).getImage();
+                            g2.drawImage(img, textX, drawY, drawW, drawH, null);
+                        } else {
+                            Graphics2D gIcon = (Graphics2D) g2.create();
+                            gIcon.translate(textX, drawY);
+                            gIcon.scale(scale, scale);
+                            titleIcon.paintIcon(this, gIcon, 0, 0);
+                            gIcon.dispose();
+                        }
+                        textX += drawW + 8;
+                    }
                 }
 
                 g2.setColor(titleColor);

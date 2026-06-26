@@ -22,7 +22,7 @@ public class CardGrafic extends JPanel implements Serializable {
         BAR, BAR_MODERN, BAR_GRADIENT, BAR_GRADIENT_COLORFUL, BAR_LOLLIPOP, BAR_LOLLIPOP_COLORFUL, 
         HORIZONTAL_BAR, HORIZONTAL_BAR_MODERN, HORIZONTAL_BAR_MODERN_2, 
         HORIZONTAL_BAR_GRADIENT, HORIZONTAL_BAR_GRADIENT_COLORFUL, HORIZONTAL_BAR_LOLLIPOP, HORIZONTAL_BAR_LOLLIPOP_COLORFUL, 
-        LINE, AREA, PIE, DONUT
+        LINE, LINE_SMOOTH, AREA, AREA_SMOOTH, AREA_GRADIENT, AREA_SMOOTH_GRADIENT, PIE, DONUT, DONUT_ROUNDED, GAUGE
     }
 
     public enum TitlePosition {
@@ -155,14 +155,12 @@ public class CardGrafic extends JPanel implements Serializable {
         double maxVal = parsedValues.stream().mapToDouble(v -> v).max().orElse(1);
         if (maxVal == 0) maxVal = 1;
 
-        if (chartType == ChartType.PIE || chartType == ChartType.DONUT) {
+        if (chartType == ChartType.PIE || chartType == ChartType.DONUT || chartType == ChartType.DONUT_ROUNDED || chartType == ChartType.GAUGE) {
             drawPieChart(g2, width, height, topMargin, bottomMargin, parsedValues, parsedLabels);
         } else if (chartType == ChartType.HORIZONTAL_BAR) {
             drawHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
-        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN) {
+        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN || chartType == ChartType.HORIZONTAL_BAR_MODERN_2) {
             drawModernHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
-        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN_2) {
-            drawModern2HorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
         } else if (chartType == ChartType.HORIZONTAL_BAR_GRADIENT || chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL) {
             drawGradientHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels, chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL);
         } else if (chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP_COLORFUL) {
@@ -560,6 +558,15 @@ public class CardGrafic extends JPanel implements Serializable {
         GeneralPath path = new GeneralPath();
         
         int firstPx = -1, lastPx = -1;
+        int prevPx = -1, prevPy = -1;
+
+        boolean isLine = (chartType == ChartType.LINE || chartType == ChartType.LINE_SMOOTH || 
+                          chartType == ChartType.AREA || chartType == ChartType.AREA_SMOOTH ||
+                          chartType == ChartType.AREA_GRADIENT || chartType == ChartType.AREA_SMOOTH_GRADIENT);
+        boolean isSmooth = (chartType == ChartType.LINE_SMOOTH || chartType == ChartType.AREA_SMOOTH || chartType == ChartType.AREA_SMOOTH_GRADIENT);
+        boolean isArea = (chartType == ChartType.AREA || chartType == ChartType.AREA_SMOOTH || 
+                          chartType == ChartType.AREA_GRADIENT || chartType == ChartType.AREA_SMOOTH_GRADIENT);
+        boolean isGradient = (chartType == ChartType.AREA_GRADIENT || chartType == ChartType.AREA_SMOOTH_GRADIENT);
 
         for (int i = 0; i < n; i++) {
             double v = vals.get(i);
@@ -575,12 +582,23 @@ public class CardGrafic extends JPanel implements Serializable {
                 int bx = px - (barWidth / 2);
                 g2.setColor(getColor(i, new Color[]{chartColor}));
                 g2.fillRoundRect(bx, py, barWidth, valHeight, 5, 5);
-            } else if (chartType == ChartType.LINE || chartType == ChartType.AREA) {
+            } else if (isLine) {
                 if (i == 0) {
                     path.moveTo(px, py);
                 } else {
-                    path.lineTo(px, py);
+                    if (isSmooth) {
+                        int cx1 = prevPx + (px - prevPx) / 2;
+                        int cy1 = prevPy;
+                        int cx2 = prevPx + (px - prevPx) / 2;
+                        int cy2 = py;
+                        path.curveTo(cx1, cy1, cx2, cy2, px, py);
+                    } else {
+                        path.lineTo(px, py);
+                    }
                 }
+                prevPx = px;
+                prevPy = py;
+                
                 g2.setColor(getColor(i, new Color[]{chartColor}));
                 g2.fillOval(px - 4, py - 4, 8, 8);
             }
@@ -595,15 +613,21 @@ public class CardGrafic extends JPanel implements Serializable {
             }
         }
 
-        if (chartType == ChartType.LINE || chartType == ChartType.AREA) {
-            if (chartType == ChartType.AREA && firstPx != -1) {
+        if (isLine) {
+            if (isArea && firstPx != -1) {
                 GeneralPath fillPath = (GeneralPath) path.clone();
                 fillPath.lineTo(lastPx, y + height);
                 fillPath.lineTo(firstPx, y + height);
                 fillPath.closePath();
                 
                 Color c = getColor(0, new Color[]{chartColor});
-                g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
+                if (isGradient) {
+                    GradientPaint gp = new GradientPaint(0, y, new Color(c.getRed(), c.getGreen(), c.getBlue(), 120), 
+                                                         0, y + height, new Color(c.getRed(), c.getGreen(), c.getBlue(), 0));
+                    g2.setPaint(gp);
+                } else {
+                    g2.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), 80));
+                }
                 g2.fill(fillPath);
             }
             g2.setColor(getColor(0, new Color[]{chartColor}));
@@ -618,8 +642,11 @@ public class CardGrafic extends JPanel implements Serializable {
         int size = Math.min(width - 40, height - topMargin - bottomMargin);
         int cx = (width - size) / 2;
         int cy = topMargin + (height - topMargin - bottomMargin - size) / 2;
+        
+        if (chartType == ChartType.GAUGE) cy += size / 4;
 
-        double startAngle = 90;
+        double startAngle = chartType == ChartType.GAUGE ? 180 : 90;
+        double totalSpan = chartType == ChartType.GAUGE ? 180 : 360;
         
         Color[] colors = {
             chartColor, 
@@ -629,14 +656,24 @@ public class CardGrafic extends JPanel implements Serializable {
             new Color(chartColor.getRed(), chartColor.getGreen(), chartColor.getBlue(), 120)
         };
 
+        if (chartType == ChartType.GAUGE) {
+            g2.setColor(gridColor);
+            g2.setStroke(new BasicStroke(size / 6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+            int offset = (int)(size / 12f);
+            Arc2D track = new Arc2D.Double(cx + offset, cy + offset, size - (offset * 2), size - (offset * 2), 180, -180, Arc2D.OPEN);
+            g2.draw(track);
+        }
+
         for (int i = 0; i < vals.size(); i++) {
             double v = vals.get(i);
-            double arcAngle = (v / total) * 360;
+            double arcAngle = (v / total) * totalSpan;
 
             g2.setColor(getColor(i, colors));
-            if (chartType == ChartType.DONUT) {
-                g2.setStroke(new BasicStroke(size / 4f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_ROUND));
-                int offset = size / 8;
+            if (chartType == ChartType.DONUT || chartType == ChartType.DONUT_ROUNDED || chartType == ChartType.GAUGE) {
+                int strokeCap = (chartType == ChartType.DONUT) ? BasicStroke.CAP_BUTT : BasicStroke.CAP_ROUND;
+                float strokeWidth = (chartType == ChartType.GAUGE) ? size / 6f : size / 4f;
+                g2.setStroke(new BasicStroke(strokeWidth, strokeCap, BasicStroke.JOIN_ROUND));
+                int offset = (int)(strokeWidth / 2f);
                 Arc2D arc = new Arc2D.Double(cx + offset, cy + offset, size - (offset * 2), size - (offset * 2), startAngle, -arcAngle, Arc2D.OPEN);
                 g2.draw(arc);
             } else {
@@ -727,7 +764,7 @@ public class CardGrafic extends JPanel implements Serializable {
      * @param items Lista de objetos
      * @param groupExtractor Função para extrair a chave de agrupamento (que também será o texto/label)
      */
-    public <T> void setGroupedItemsAndCount(List<T> items, java.util.function.Function<T, String> groupExtractor) {
+    public <T> void setItemsObjectCount(List<T> items, java.util.function.Function<T, String> groupExtractor) {
         if (items == null) return;
         
         java.util.Map<String, Long> contagem = items.stream()

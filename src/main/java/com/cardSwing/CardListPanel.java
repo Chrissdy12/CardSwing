@@ -93,6 +93,13 @@ public class CardListPanel extends JPanel implements Serializable {
     /** Retorna o container interno (para acesso avançado). */
     public JPanel getContainer() { return container; }
 
+    @Override
+    public void setBackground(Color bg) {
+        super.setBackground(bg);
+        if (container != null) container.setBackground(bg);
+        if (scrollPane != null && scrollPane.getViewport() != null) scrollPane.getViewport().setBackground(bg);
+    }
+
     /** Adiciona um componente como card. */
     public void addCard(Component card) {
         container.add(card);
@@ -193,10 +200,5 @@ public class CardListPanel extends JPanel implements Serializable {
         this.onScrollEnd = onScrollEnd;
     }
 
-    @Override
-    public void setBackground(Color bg) {
-        super.setBackground(bg);
-        if (container != null) container.setBackground(bg);
-        if (scrollPane != null && scrollPane.getViewport() != null) scrollPane.getViewport().setBackground(bg);
-    }
+
 }

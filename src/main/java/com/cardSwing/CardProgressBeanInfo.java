@@ -18,7 +18,7 @@ public class CardProgressBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardProgress");
+        return CardSwingIcons.getIconFor("CardProgress");
     }
 
     @Override
@@ -27,7 +27,7 @@ public class CardProgressBeanInfo extends SimpleBeanInfo {
             List<PropertyDescriptor> props = new ArrayList<>();
                         String[] customProps = {
                 "text", "title", "titleIcon", "font", "foreground", "background", "icon", "selected", 
-                "progress", "currentValue", "totalValue", "showPercentage",
+                "progress", "currentValue", "totalValue", "showPercentage", "model",
                 "barColor", "trackColor", "showLabel", "barHeight", 
                 "lineColor", "thickness", "verticalMargin", "verticalPadding", 
                 "label", "value", "valueColor", "showDot", 
@@ -49,7 +49,7 @@ public class CardProgressBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardProgress.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardProgress Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

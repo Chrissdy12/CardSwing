@@ -18,7 +18,7 @@ public class CardSeparatorBeanInfo extends SimpleBeanInfo {
     
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardSeparator");
+        return CardSwingIcons.getIconFor("CardSeparator");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class CardSeparatorBeanInfo extends SimpleBeanInfo {
                 "text", "title", "titleIcon", "font", "foreground", "background", "icon", "selected", 
                 "progress", "currentValue", "totalValue", "showPercentage",
                 "barColor", "trackColor", "showLabel", "barHeight", 
-                "lineColor", "thickness", "verticalMargin", "verticalPadding", 
+                "lineColor", "thickness", "verticalMargin", "verticalPadding", "style", "gradientEndColor",
                 "label", "value", "valueColor", "showDot", 
                 "tagColor", "tagTextColor", "tagRadius", "cornerRadius", "buttonRadius",
                 "buttonColor", "hoverColor", "pressedColor", "textColor", "imagePath", 
@@ -49,7 +49,7 @@ public class CardSeparatorBeanInfo extends SimpleBeanInfo {
                 try {
                     PropertyDescriptor pd = new PropertyDescriptor(propName, CardSeparator.class);
                     pd.setPreferred(true);
-                    pd.setValue("category", "CardMury Configs");
+                    pd.setValue("category", "CardSeparator Configs");
                     props.add(pd);
                 } catch (Exception ignored) { }
             }

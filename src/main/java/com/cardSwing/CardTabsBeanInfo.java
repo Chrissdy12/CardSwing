@@ -15,7 +15,7 @@ public class CardTabsBeanInfo extends SimpleBeanInfo {
 
     @Override
     public java.awt.Image getIcon(int iconKind) {
-        return CardMuryIcons.getIconFor("CardTabs");
+        return CardSwingIcons.getIconFor("CardTabs");
     }
 
     @Override
@@ -25,9 +25,9 @@ public class CardTabsBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor unselectedTextColor = new PropertyDescriptor("unselectedTextColor", CardTabs.class);
             PropertyDescriptor trackColor = new PropertyDescriptor("trackColor", CardTabs.class);
             
-            themeColor.setValue("category", "CardMury Configs");
-            unselectedTextColor.setValue("category", "CardMury Configs");
-            trackColor.setValue("category", "CardMury Configs");
+            themeColor.setValue("category", "CardTabs Configs");
+            unselectedTextColor.setValue("category", "CardTabs Configs");
+            trackColor.setValue("category", "CardTabs Configs");
 
             PropertyDescriptor[] props = {themeColor, unselectedTextColor, trackColor};
             for (PropertyDescriptor pd : props) {

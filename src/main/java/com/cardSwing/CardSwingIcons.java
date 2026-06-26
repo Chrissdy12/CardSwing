@@ -4,12 +4,12 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
- * Classe utilitária para desenhar ícones para a Palette do NetBeans
+ * Classe utilitÃ¡ria para desenhar Ã­cones para a Palette do NetBeans
  * sem precisar carregar arquivos de imagem externos.
  */
-public class CardMuryIcons {
+public class CardSwingIcons {
     
-    private CardMuryIcons() {} // Impede que apareça na Palette do NetBeans
+    private CardSwingIcons() {} // Impede que apareÃ§a na Palette do NetBeans
 
     public static Image getIconFor(String name) {
         BufferedImage img = new BufferedImage(16, 16, BufferedImage.TYPE_INT_ARGB);
@@ -136,14 +136,14 @@ public class CardMuryIcons {
             g2.setColor(new Color(59, 130, 246));
             g2.fillRect(3, 11, 5, 1);
         } else if (name.equals("CardDatePicker") || name.equals("CardDateTimePicker")) {
-            g2.setColor(new Color(226, 232, 240)); // Slate 200 (Borda/Fundo calendário)
+            g2.setColor(new Color(226, 232, 240)); // Slate 200 (Borda/Fundo calendÃ¡rio)
             g2.fillRoundRect(2, 3, 12, 10, 2, 2);
             g2.setColor(Color.WHITE); // Fundo
             g2.fillRoundRect(3, 4, 10, 8, 2, 2);
             g2.setColor(new Color(59, 130, 246)); // Azul Header
-            g2.fillRect(3, 4, 10, 3); // Header azul do calendário
+            g2.fillRect(3, 4, 10, 3); // Header azul do calendÃ¡rio
             
-            // Furos do fichário (Molas)
+            // Furos do fichÃ¡rio (Molas)
             g2.setColor(new Color(15, 23, 42)); // Slate 900
             g2.drawLine(5, 2, 5, 4);
             g2.drawLine(10, 2, 10, 4);
@@ -160,7 +160,7 @@ public class CardMuryIcons {
                 g2.fillRect(11, 9, 1, 2); // Ponteiros
             }
         } else {
-            // Default genérico
+            // Default genÃ©rico
             g2.setColor(Color.GRAY);
             g2.fillRoundRect(2, 2, 12, 12, 4, 4);
         }
