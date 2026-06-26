@@ -97,25 +97,34 @@ public class CardChip extends JPanel {
         g2.setColor(bg);
         g2.fillRoundRect(0, 0, w, h, arc, arc);
 
+        // Define a fonte baseada no componente
+        Font f = getFont();
+        if (f == null || f.getSize() <= 1) {
+            f = new Font("Segoe UI", Font.BOLD, 12);
+            setFont(f);
+        }
+        g2.setFont(f);
+
         // Texto
         g2.setColor(fg);
-        g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
         FontMetrics fm = g2.getFontMetrics();
         int txtY = (h + fm.getAscent() - fm.getDescent()) / 2;
-        g2.drawString(text, 12, txtY);
+        int txtX = fm.getHeight(); // Padding esquerdo baseado no tamanho da fonte
+        g2.drawString(text, txtX, txtY);
 
         // Ícone de fechar (X) redondo na ponta direita
         int cx = w - (h / 2);
         int cy = h / 2;
-        int iconSize = 8;
+        int iconSize = Math.max(8, (int)(fm.getHeight() * 0.6));
 
         if (hoveredClose) {
             g2.setColor(new Color(255, 0, 0, 40)); // Feedback visual de erro/fechar
-            g2.fillOval(cx - 10, cy - 10, 20, 20);
+            int hoverSize = Math.max(20, fm.getHeight() + 4);
+            g2.fillOval(cx - (hoverSize/2), cy - (hoverSize/2), hoverSize, hoverSize);
         }
 
         g2.setColor(fg);
-        g2.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g2.setStroke(new BasicStroke(Math.max(1.5f, f.getSize() / 8f), BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
         int o = iconSize / 2;
         g2.drawLine(cx - o, cy - o, cx + o, cy + o);
         g2.drawLine(cx - o, cy + o, cx + o, cy - o);
@@ -125,9 +134,13 @@ public class CardChip extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        FontMetrics fm = getFontMetrics(new Font("Segoe UI", Font.BOLD, 12));
-        int w = 12 + fm.stringWidth(text) + 12 + 20; // Esquerda + Texto + Dir + Botão
-        return new Dimension(w, 28);
+        Font f = getFont();
+        if (f == null || f.getSize() <= 1) f = new Font("Segoe UI", Font.BOLD, 12);
+        FontMetrics fm = getFontMetrics(f);
+        int pad = fm.getHeight(); // Padding baseado na fonte
+        int w = pad + fm.stringWidth(text) + pad + pad; // Esquerda + Texto + Dir + Botão
+        int h = fm.getHeight() + 12; // Altura adaptativa
+        return new Dimension(w, h);
     }
     
     public String getText() { return text; }
