@@ -4,6 +4,20 @@
 
 ---
 
+## 📑 Sumário
+
+1. [Gerenciamento Global de Tema](#-1-gerenciamento-global-de-tema-cardthememanager)
+2. [Gráficos Modernos](#-2-gráficos-modernos-cardgrafic)
+3. [Tabelas e Listagens](#-3-tabelas-e-listagens)
+4. [Threads, Notificações e PopUps](#-4-threads-notificações-e-popups)
+5. [Containers e Tipografia](#-5-containers-e-tipografia)
+6. [Campos de Entrada (Inputs)](#-6-campos-de-entrada-inputs)
+7. [Datas e Calendários](#-7-datas-e-calendários)
+8. [Tags, Filtros e Checkboxes](#-8-tags-filtros-e-checkboxes)
+9. [Mídia, Abas e Efeitos](#-9-mídia-abas-e-efeitos)
+
+---
+
 ## 🎨 1. Gerenciamento Global de Tema (`CardThemeManager`)
 O recurso mais poderoso do CardSwing. Altera **toda a sua aplicação** (incluindo componentes Swing nativos como `JButton`, `JTable`, e `JScrollPane`) para uma nova paleta de cores moderna.
 
@@ -256,6 +270,9 @@ O `CardSwitch` é um toggle responsivo (estilo iOS/Android).
 CardSwitch toggleAndroid = new CardSwitch();
 toggleAndroid.setTrackOnColor(new Color(59, 130, 246)); // Azul ativo
 boolean ligado = toggleAndroid.isSelected();
+
+CardCheck checkboxModerno = new CardCheck("Aceitar os Termos", false);
+checkboxModerno.setCheckColor(new Color(16, 185, 129)); // Verde
 ```
 
 ### `CardChip` (Filtros Removíveis)
@@ -279,6 +296,13 @@ badge.setBadgeColor(new Color(239, 68, 68)); // Vermelho alerta
 - `CardTag`: Rótulo de status fixo (Ex: verde para "Concluído").
 - `CardStatusBadge`: Uma Tag moderna com efeito de luz sutil de status.
 - `CardStatusRow`: Painel auto-organizado para dispor várias Tags lado a lado.
+```java
+CardTag tag = new CardTag("Aprovado");
+tag.setTagColor(new Color(209, 250, 229));
+
+CardStatusRow statusRow = new CardStatusRow();
+statusRow.addStatus("Lucro", "+ 15%", new Color(16, 185, 129));
+```
 
 ---
 
@@ -292,6 +316,10 @@ CardAvatar fotoPerfil = new CardAvatar();
 fotoPerfil.setImagePath("C:\\fotos\\cliente1.jpg");
 fotoPerfil.setInitials("CH"); // Exibido caso a imagem quebre
 fotoPerfil.setShowOnlineDot(true); // Exibe bolinha verde de online
+
+CardImage banner = new CardImage();
+banner.setImagePath("C:\\fotos\\banner.png");
+banner.setImageRadius(20);
 ```
 
 ### `CardTabs`
