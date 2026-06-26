@@ -45,15 +45,15 @@ public class CardCalendar extends JPanel {
         headerPanel.setOpaque(false);
 
         lblMonthYear = new JLabel("", SwingConstants.CENTER);
-        lblMonthYear.setFont(new Font("Segoe UI", Font.BOLD, 15));
+        lblMonthYear.setFont(new Font("Segoe UI", Font.BOLD, 16));
         
-        btnPrev = createNavButton("<");
+        btnPrev = createNavButton(true);
         btnPrev.addActionListener(e -> {
             displayMonth = displayMonth.minusMonths(1);
             updateCalendar();
         });
 
-        btnNext = createNavButton(">");
+        btnNext = createNavButton(false);
         btnNext.addActionListener(e -> {
             displayMonth = displayMonth.plusMonths(1);
             updateCalendar();
@@ -62,7 +62,7 @@ public class CardCalendar extends JPanel {
         headerPanel.add(btnPrev, BorderLayout.WEST);
         headerPanel.add(lblMonthYear, BorderLayout.CENTER);
         headerPanel.add(btnNext, BorderLayout.EAST);
-        headerPanel.setBorder(new EmptyBorder(0, 0, 15, 0));
+        headerPanel.setBorder(new EmptyBorder(5, 5, 15, 5));
 
         add(headerPanel, BorderLayout.NORTH);
 
@@ -71,8 +71,9 @@ public class CardCalendar extends JPanel {
         bodyPanel.setOpaque(false);
 
         // Days of week
-        dowPanel = new JPanel(new GridLayout(1, 7, 5, 5));
+        dowPanel = new JPanel(new GridLayout(1, 7, 0, 0));
         dowPanel.setOpaque(false);
+        dowPanel.setBorder(new EmptyBorder(0, 0, 10, 0));
         String[] days = {"D", "S", "T", "Q", "Q", "S", "S"};
         for (String day : days) {
             JLabel lbl = new JLabel(day, SwingConstants.CENTER);
@@ -82,7 +83,7 @@ public class CardCalendar extends JPanel {
         bodyPanel.add(dowPanel, BorderLayout.NORTH);
 
         // Grid of dates
-        daysGrid = new JPanel(new GridLayout(6, 7, 5, 5));
+        daysGrid = new JPanel(new GridLayout(6, 7, 2, 2));
         daysGrid.setOpaque(false);
         bodyPanel.add(daysGrid, BorderLayout.CENTER);
 
@@ -92,12 +93,40 @@ public class CardCalendar extends JPanel {
         updateCalendar();
     }
 
-    private JButton createNavButton(String text) {
-        JButton btn = new JButton(text);
+    private JButton createNavButton(boolean isPrev) {
+        JButton btn = new JButton() {
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                if (getModel().isRollover()) {
+                    g2.setColor(hoverColor);
+                    g2.fillRoundRect(0, 0, getWidth(), getHeight(), 10, 10);
+                }
+
+                g2.setColor(defaultTextColor);
+                g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                
+                int cx = getWidth() / 2;
+                int cy = getHeight() / 2;
+                int size = 4;
+                
+                if (isPrev) {
+                    g2.drawLine(cx + size, cy - size, cx - size, cy);
+                    g2.drawLine(cx - size, cy, cx + size, cy + size);
+                } else {
+                    g2.drawLine(cx - size, cy - size, cx + size, cy);
+                    g2.drawLine(cx + size, cy, cx - size, cy + size);
+                }
+                
+                g2.dispose();
+            }
+        };
+        btn.setPreferredSize(new Dimension(30, 30));
         btn.setContentAreaFilled(false);
         btn.setFocusPainted(false);
         btn.setBorderPainted(false);
-        btn.setFont(new Font("Segoe UI", Font.BOLD, 16));
         btn.setCursor(new Cursor(Cursor.HAND_CURSOR));
         return btn;
     }
@@ -120,8 +149,8 @@ public class CardCalendar extends JPanel {
             hoverColor = theme.isDark ? new Color(255, 255, 255, 20) : new Color(0, 0, 0, 10);
             
             if (lblMonthYear != null) lblMonthYear.setForeground(defaultTextColor);
-            if (btnPrev != null) btnPrev.setForeground(defaultTextColor);
-            if (btnNext != null) btnNext.setForeground(defaultTextColor);
+            if (btnPrev != null) btnPrev.repaint();
+            if (btnNext != null) btnNext.repaint();
             
             if (dowPanel != null) {
                 for (Component c : dowPanel.getComponents()) {
@@ -156,16 +185,10 @@ public class CardCalendar extends JPanel {
 
     // === PROPRIEDADES ===
 
-    /**
-     * Retorna o dia selecionado atualmente.
-     */
     public LocalDate getLocalDate() {
         return selectedDate;
     }
 
-    /**
-     * Define o dia selecionado e muda o mês exibido para o mesmo.
-     */
     public void setLocalDate(LocalDate date) {
         LocalDate old = this.selectedDate;
         this.selectedDate = date;
@@ -216,24 +239,28 @@ public class CardCalendar extends JPanel {
             boolean isSelected = date.equals(selectedDate);
             boolean isToday = date.equals(LocalDate.now());
 
-            int s = Math.min(getWidth(), getHeight());
-            int x = (getWidth() - s) / 2;
-            int y = (getHeight() - s) / 2;
+            // Fundo flexível: vira um Círculo se for quadrado, ou uma "Pílula" (Pill) se for achatado/esticado
+            int pad = 4; // Margem de respiro para nunca encostar nas bordas
+            int w = getWidth() - (pad * 2);
+            int h = getHeight() - (pad * 2);
+            int radius = Math.min(w, h); // Arredondamento suave e adaptável
 
-            // Fundo
+            // Fundo do Dia
             if (isSelected) {
                 g2.setColor(primaryColor);
-                g2.fillOval(x, y, s, s);
+                g2.fillRoundRect(pad, pad, w, h, radius, radius);
             } else if (hovered) {
                 g2.setColor(hoverColor);
-                g2.fillOval(x, y, s, s);
+                g2.fillRoundRect(pad, pad, w, h, radius, radius);
             } else if (isToday) {
                 g2.setColor(new Color(primaryColor.getRed(), primaryColor.getGreen(), primaryColor.getBlue(), 30));
-                g2.fillOval(x, y, s, s);
+                g2.fillRoundRect(pad, pad, w, h, radius, radius);
             }
 
-            // Texto
-            g2.setFont(new Font("Segoe UI", isSelected || isToday ? Font.BOLD : Font.PLAIN, 12));
+            // Texto do Dia adaptativo
+            // Se a célula estiver muito achatada (< 25px de altura), reduzimos a fonte para caber bonito
+            int fontSize = (getHeight() < 25) ? 11 : 13;
+            g2.setFont(new Font("Segoe UI", isSelected || isToday ? Font.BOLD : Font.PLAIN, fontSize));
             String txt = String.valueOf(date.getDayOfMonth());
             FontMetrics fm = g2.getFontMetrics();
 
@@ -246,16 +273,20 @@ public class CardCalendar extends JPanel {
                     g2.setColor(defaultTextColor);
                 }
             } else {
-                g2.setColor(disabledTextColor);
+                g2.setColor(disabledTextColor); // Dias de outros meses apagam
             }
 
-            g2.drawString(txt, (getWidth() - fm.stringWidth(txt)) / 2, (getHeight() + fm.getAscent() - fm.getDescent()) / 2);
+            // Centraliza o texto perfeitamente usando a largura total do panel, não da bolinha
+            int textX = (getWidth() - fm.stringWidth(txt)) / 2;
+            int textY = (getHeight() - fm.getHeight()) / 2 + fm.getAscent();
+
+            g2.drawString(txt, textX, textY);
             g2.dispose();
         }
 
         @Override
         public Dimension getPreferredSize() {
-            return new Dimension(32, 32);
+            return new Dimension(40, 40); // Força um tamanho quadrado padrão
         }
     }
 }

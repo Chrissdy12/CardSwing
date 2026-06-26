@@ -99,6 +99,31 @@ public class CardSwingIcons {
             g2.drawRoundRect(1, 4, 14, 8, 2, 2);
             g2.setColor(new Color(107, 114, 128));
             g2.fillPolygon(new int[]{10, 13, 11}, new int[]{7, 7, 10}, 3);
+        } else if (name.equals("CardCalendar")) {
+            g2.setColor(new Color(226, 232, 240));
+            g2.fillRoundRect(2, 3, 12, 10, 2, 2);
+            g2.setColor(new Color(59, 130, 246));
+            g2.fillRect(2, 3, 12, 3);
+            g2.setColor(Color.WHITE);
+            g2.fillRect(4, 8, 2, 2);
+            g2.fillRect(7, 8, 2, 2);
+            g2.fillRect(10, 8, 2, 2);
+            g2.fillRect(4, 11, 2, 2);
+        } else if (name.equals("CardBadge")) {
+            g2.setColor(new Color(239, 68, 68)); // Red
+            g2.fillOval(3, 3, 10, 10);
+            g2.setColor(Color.WHITE);
+            g2.fillOval(5, 5, 2, 2);
+            g2.fillOval(9, 5, 2, 2);
+            g2.drawArc(5, 7, 6, 4, 180, 180); // Sorriso
+        } else if (name.equals("CardChip")) {
+            g2.setColor(new Color(226, 232, 240));
+            g2.fillRoundRect(1, 4, 14, 8, 8, 8);
+            g2.setColor(Color.WHITE);
+            g2.fillOval(10, 5, 6, 6);
+            g2.setColor(new Color(100, 116, 139));
+            g2.drawLine(12, 7, 14, 9);
+            g2.drawLine(14, 7, 12, 9);
         } else if (name.equals("CardGrafic")) {
             g2.setColor(new Color(226, 232, 240));
             g2.drawLine(2, 2, 2, 14); // Eixo Y
