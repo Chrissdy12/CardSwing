@@ -29,6 +29,7 @@ public class CardComboBox<E> extends JComboBox<E> implements Serializable {
     private Color focusColor = new Color(59, 130, 246); // Blue 500
     private Color hoverColor = new Color(156, 163, 175); // Gray 400
 
+    private boolean editable = true;
     private boolean isHovered = false;
 
     public CardComboBox() {
@@ -106,6 +107,27 @@ public class CardComboBox<E> extends JComboBox<E> implements Serializable {
     @SuppressWarnings("unchecked")
     public E getSelectItem() {
         return (E) getSelectedItem();
+    }
+
+    @Override
+    public void setEditable(boolean editable) {
+        boolean old = this.editable;
+        this.editable = editable;
+        firePropertyChange("editable", old, editable);
+        repaint();
+    }
+
+    @Override
+    public boolean isEditable() {
+        return editable;
+    }
+
+    @Override
+    public void setPopupVisible(boolean v) {
+        if (v && !editable) {
+            return;
+        }
+        super.setPopupVisible(v);
     }
 
     @Override

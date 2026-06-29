@@ -37,20 +37,28 @@ public class CardTable extends JScrollPane implements Serializable {
 
     private void setup() {
         // Estilo do ScrollPane
-        setBorder(BorderFactory.createLineBorder(tableGridColor));
-        getViewport().setBackground(Color.WHITE);
+        CardThemeManager.CardTheme themeInit = CardThemeManager.getCurrentTheme();
+        if (themeInit != null) {
+            getViewport().setBackground(themeInit.surface);
+        } else {
+            getViewport().setBackground(Color.WHITE);
+        }
         
         // Estilo da Tabela
         table.setFillsViewportHeight(true);
-        table.setBackground(Color.WHITE);
-        table.setRowHeight(40);
+        table.setRowHeight(35); // Tamanho bom para FlatLaf
         table.setShowGrid(false);
         table.setShowHorizontalLines(true);
-        table.setGridColor(tableGridColor);
-        table.setIntercellSpacing(new Dimension(0, 0));
         table.setFont(new Font("Segoe UI", Font.PLAIN, 14));
-        table.setForeground(new Color(51, 65, 85));
         
+        // Sincroniza fundo inicial
+        CardThemeManager.CardTheme theme = CardThemeManager.getCurrentTheme();
+        if (theme != null) {
+            table.setBackground(theme.surface);
+            table.setForeground(theme.textSecondary);
+            table.setGridColor(theme.border);
+        }
+
         // Default Model para aparecer bonito no editor
         table.setModel(new DefaultTableModel(
             new Object[][] {
@@ -61,59 +69,8 @@ public class CardTable extends JScrollPane implements Serializable {
             new String[] {"Nome", "Email", "Status"}
         ));
         
-        // Efeito Hover
-        table.addMouseMotionListener(new MouseAdapter() {
-            @Override
-            public void mouseMoved(MouseEvent e) {
-                int row = table.rowAtPoint(e.getPoint());
-                if (row != hoveredRow) {
-                    hoveredRow = row;
-                    table.repaint();
-                }
-            }
-        });
-        table.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseExited(MouseEvent e) {
-                hoveredRow = -1;
-                table.repaint();
-            }
-        });
-
-        // Header Customizado
-        JTableHeader header = table.getTableHeader();
-        header.setDefaultRenderer(new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setBackground(headerColor);
-                label.setForeground(headerTextColor);
-                label.setFont(new Font("Segoe UI", Font.BOLD, 13));
-                label.setBorder(BorderFactory.createCompoundBorder(
-                    BorderFactory.createMatteBorder(0, 0, 1, 0, tableGridColor),
-                    new EmptyBorder(10, 15, 10, 15)
-                ));
-                return label;
-            }
-        });
-        
-        // Células Customizadas
-        table.setDefaultRenderer(Object.class, new DefaultTableCellRenderer() {
-            @Override
-            public Component getTableCellRendererComponent(JTable table, Object value, boolean isSelected, boolean hasFocus, int row, int column) {
-                JLabel label = (JLabel) super.getTableCellRendererComponent(table, value, isSelected, hasFocus, row, column);
-                label.setBorder(new EmptyBorder(0, 15, 0, 15)); // Padding horizontal
-                
-                if (isSelected) {
-                    label.setBackground(selectionColor);
-                } else if (row == hoveredRow) {
-                    label.setBackground(rowHoverColor);
-                } else {
-                    label.setBackground(Color.WHITE);
-                }
-                return label;
-            }
-        });
+        // FlatLaf cuidará do hover, seleções, bordas e renderização do cabeçalho!
+        // Não é mais necessário recriar os Renderers manualmente.
     }
 
     /**
@@ -154,6 +111,17 @@ public class CardTable extends JScrollPane implements Serializable {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false; // Desativa edição direto na célula
+            }
+
+            @Override
+            public Class<?> getColumnClass(int column) {
+                if (getRowCount() > 0) {
+                    Object value = getValueAt(0, column);
+                    if (value != null) {
+                        return value.getClass();
+                    }
+                }
+                return Object.class;
             }
         };
         table.setModel(model);

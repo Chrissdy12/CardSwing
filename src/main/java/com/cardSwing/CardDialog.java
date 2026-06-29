@@ -11,18 +11,39 @@ import javax.swing.*;
  */
 public class CardDialog extends JDialog {
 
+    public enum DialogType {
+        CONFIRM(new Color(59, 130, 246), "?"),
+        INPUT(new Color(59, 130, 246), "✎"),
+        SUCCESS(new Color(16, 185, 129), "✓"),
+        ERROR(new Color(239, 68, 68), "✕"),
+        INFO(new Color(59, 130, 246), "i"),
+        WARNING(new Color(245, 158, 11), "!");
+
+        Color color;
+        String iconText;
+
+        DialogType(Color c, String i) {
+            this.color = c;
+            this.iconText = i;
+        }
+    }
+
     private boolean confirmed = false;
     private String inputValue = null;
+    private DialogType type;
 
     private static Window getWindow(Component parentComponent) {
-        if (parentComponent == null) return null;
-        if (parentComponent instanceof Window) return (Window) parentComponent;
+        if (parentComponent == null)
+            return null;
+        if (parentComponent instanceof Window)
+            return (Window) parentComponent;
         return SwingUtilities.getWindowAncestor(parentComponent);
     }
 
     // Construtor privado (usado internamente pelos métodos estáticos)
-    private CardDialog(Component parentComponent, String title, String message, boolean isInput, Object[] options) {
+    private CardDialog(Component parentComponent, String title, String message, DialogType type, Object[] options) {
         super(getWindow(parentComponent));
+        this.type = type;
         setModal(true);
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 80)); // Fundo escuro semi-transparente (Backdrop)
@@ -37,54 +58,78 @@ public class CardDialog extends JDialog {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 // Sombra suave
                 g2.setColor(new Color(0, 0, 0, 10));
                 g2.fillRoundRect(2, 6, getWidth() - 4, getHeight() - 8, 24, 24);
                 g2.setColor(new Color(0, 0, 0, 5));
                 g2.fillRoundRect(4, 8, getWidth() - 8, getHeight() - 12, 24, 24);
-                
+
                 // Fundo Branco puro
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, getWidth() - 8, getHeight() - 10, 24, 24);
-                
-                // Ícone ilustrativo sutil (Círculo Azul Claro com um 'i' ou '?')
-                g2.setColor(new Color(239, 246, 255)); // Blue 50
-                g2.fillOval(30, 25, 40, 40);
-                g2.setColor(new Color(59, 130, 246)); // Blue 500
-                g2.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                if (isInput) {
-                    // Ícone de caneta/edição simplificado
-                    g2.drawLine(44, 52, 48, 48);
-                    g2.drawLine(48, 48, 54, 38);
-                    g2.drawLine(54, 38, 56, 40);
-                    g2.drawLine(56, 40, 50, 50);
-                    g2.drawLine(50, 50, 44, 52);
+
+                // Ícone ilustrativo sutil
+                Color fgIconColor = CardDialog.this.type.color;
+                Color bgIconColor;
+
+                if (CardDialog.this.type == DialogType.SUCCESS) {
+                    bgIconColor = new Color(240, 253, 244); // Green 50
+                } else if (CardDialog.this.type == DialogType.ERROR) {
+                    bgIconColor = new Color(254, 242, 242); // Red 50
+                } else if (CardDialog.this.type == DialogType.WARNING) {
+                    bgIconColor = new Color(255, 251, 235); // Amber 50
                 } else {
-                    // Ícone de interrogação
-                    g2.drawArc(46, 33, 10, 10, 0, 180);
-                    g2.drawLine(56, 38, 51, 43);
-                    g2.drawLine(51, 43, 51, 46);
-                    g2.fillOval(49, 49, 4, 4);
+                    bgIconColor = new Color(239, 246, 255); // Blue 50
+                }
+
+                g2.setColor(bgIconColor);
+                g2.fillOval(30, 25, 40, 40);
+
+                g2.setColor(fgIconColor);
+                
+                if (CardDialog.this.type == DialogType.SUCCESS) {
+                    g2.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(42, 46, 47, 51);
+                    g2.drawLine(47, 51, 58, 38);
+                } else if (CardDialog.this.type == DialogType.ERROR) {
+                    g2.setStroke(new BasicStroke(3f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    g2.drawLine(42, 37, 58, 53);
+                    g2.drawLine(58, 37, 42, 53);
+                } else if (CardDialog.this.type == DialogType.INPUT) {
+                    g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+                    // Lápis customizado
+                    g2.drawLine(52, 38, 43, 47);
+                    g2.drawLine(55, 41, 46, 50);
+                    g2.drawLine(52, 38, 55, 41);
+                    g2.drawLine(43, 47, 41, 52);
+                    g2.drawLine(46, 50, 41, 52);
+                } else {
+                    g2.setFont(new Font("Segoe UI", Font.BOLD, 22));
+                    FontMetrics fm = g2.getFontMetrics();
+                    String text = CardDialog.this.type.iconText;
+                    int textX = 30 + (40 - fm.stringWidth(text)) / 2;
+                    int textY = 25 + ((40 - fm.getHeight()) / 2) + fm.getAscent();
+                    g2.drawString(text, textX, textY);
                 }
 
                 // Separador sutil acima dos botões
                 g2.setColor(new Color(241, 245, 249)); // Slate 100
                 g2.fillRect(0, getHeight() - 75, getWidth() - 8, 2);
-                
+
                 g2.dispose();
             }
         };
         cardPanel.setOpaque(false);
         cardPanel.setLayout(null);
-        
-        int cardWidth = 360; // Reduzido de 400 para caber em telas/frames pequenos
-        
+
+        int cardWidth = 360; 
+
         // --- TÍTULO ---
         JLabel lblTitle = new JLabel(title);
         lblTitle.setFont(new Font("Segoe UI", Font.BOLD, 18));
         lblTitle.setForeground(new Color(15, 23, 42)); // Slate 900
-        lblTitle.setBounds(85, 25, 250, 40); 
+        lblTitle.setBounds(85, 25, 250, 40);
         cardPanel.add(lblTitle);
 
         // --- MENSAGEM ---
@@ -106,7 +151,7 @@ public class CardDialog extends JDialog {
         int yOffset = 135;
 
         // --- INPUT FIELD / COMBOBOX ---
-        if (isInput) {
+        if (type == DialogType.INPUT) {
             if (options != null && options.length > 0) {
                 comboField = new CardComboBox<>(options);
                 comboField.setBounds(30, yOffset, 300, 40);
@@ -115,7 +160,7 @@ public class CardDialog extends JDialog {
                 inputField = new CardTextField();
                 inputField.setPlaceholder("Digite aqui...");
                 inputField.setBounds(30, yOffset, 300, 40);
-                
+
                 inputField.addKeyListener(new KeyAdapter() {
                     @Override
                     public void keyPressed(KeyEvent e) {
@@ -132,28 +177,18 @@ public class CardDialog extends JDialog {
 
         // --- BOTÕES ---
         int footerY = yOffset + 15;
-        
-        CardButton btnCancel = new CardButton();
-        btnCancel.setText("Cancelar");
-        btnCancel.setButtonColor(new Color(241, 245, 249)); // Slate 100
-        btnCancel.setTextColor(new Color(71, 85, 105)); // Slate 600
-        btnCancel.setBounds(135, footerY, 95, 36);
-        btnCancel.addActionListener(e -> {
-            confirmed = false;
-            dispose();
-        });
 
         CardButton btnConfirm = new CardButton();
         btnConfirm.setText("Confirmar");
-        btnConfirm.setButtonColor(new Color(59, 130, 246)); // Blue 500
+        btnConfirm.setButtonColor(CardDialog.this.type.color); // Usa a cor principal
         btnConfirm.setTextColor(Color.WHITE);
         btnConfirm.setBounds(240, footerY, 95, 36);
-        
+
         final CardTextField finalInputField = inputField;
         final CardComboBox<Object> finalComboField = comboField;
         btnConfirm.addActionListener(e -> {
             confirmed = true;
-            if (isInput) {
+            if (CardDialog.this.type == DialogType.INPUT) {
                 if (finalComboField != null) {
                     Object item = finalComboField.getSelectedItem();
                     inputValue = (item != null) ? item.toString() : "";
@@ -164,7 +199,22 @@ public class CardDialog extends JDialog {
             dispose();
         });
 
-        cardPanel.add(btnCancel);
+        if (type == DialogType.CONFIRM || type == DialogType.INPUT) {
+            CardButton btnCancel = new CardButton();
+            btnCancel.setText("Cancelar");
+            btnCancel.setButtonColor(new Color(241, 245, 249)); // Slate 100
+            btnCancel.setTextColor(new Color(71, 85, 105)); // Slate 600
+            btnCancel.setBounds(135, footerY, 95, 36);
+            btnCancel.addActionListener(e -> {
+                confirmed = false;
+                dispose();
+            });
+            cardPanel.add(btnCancel);
+        } else {
+            // Apenas botão OK para SUCCESS, ERROR, WARNING, INFO
+            btnConfirm.setText("OK");
+        }
+
         cardPanel.add(btnConfirm);
 
         // Tamanho do Card garantido para evitar que o GridBagLayout esmague ele a 0x0
@@ -173,16 +223,16 @@ public class CardDialog extends JDialog {
         cardPanel.setPreferredSize(size);
         cardPanel.setMinimumSize(size);
         cardPanel.setMaximumSize(size);
-        
+
         wrapper.add(cardPanel, new GridBagConstraints());
         setContentPane(wrapper);
-        
-        // Permite fechar a janela ao pressionar ESCAPE (Segurança caso a UI quebre no futuro)
+
+        // Permite fechar a janela ao pressionar ESCAPE
         getRootPane().registerKeyboardAction(e -> {
             confirmed = false;
             dispose();
         }, KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), JComponent.WHEN_IN_FOCUSED_WINDOW);
-        
+
         // Define o tamanho igual ao do parent (overlay total apenas na área de conteúdo)
         if (parentComponent != null) {
             try {
@@ -200,8 +250,8 @@ public class CardDialog extends JDialog {
             Rectangle bounds = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
             setBounds(bounds);
         }
-        
-        if (isInput && inputField != null) {
+
+        if (type == DialogType.INPUT && inputField != null) {
             inputField.requestFocus();
         }
     }
@@ -212,26 +262,20 @@ public class CardDialog extends JDialog {
 
     /**
      * Mostra um diálogo de Confirmação (Sim/Não).
-     * Exemplo: if (CardDialog.showConfirm(this, "Excluir", "Deseja excluir o item?")) { ... }
-     * 
-     * @return true se clicou em "Confirmar", false se cancelou ou fechou.
      */
     public static boolean showConfirm(Component parent, String title, String message) {
-        CardDialog dialog = new CardDialog(parent, title, message, false, null);
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.CONFIRM, null);
         dialog.setVisible(true); // Trava a tela aqui até fechar
         return dialog.confirmed;
     }
 
     /**
      * Mostra um diálogo para o usuário digitar um valor (Input).
-     * Exemplo: String nome = CardDialog.showInput(this, "Novo Cliente", "Qual o nome do cliente?");
-     * 
-     * @return O texto digitado, ou null se o usuário cancelou.
      */
     public static String showInput(Component parent, String title, String message) {
-        CardDialog dialog = new CardDialog(parent, title, message, true, null);
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.INPUT, null);
         dialog.setVisible(true); // Trava a tela aqui até fechar
-        
+
         if (dialog.confirmed) {
             return dialog.inputValue;
         }
@@ -240,17 +284,46 @@ public class CardDialog extends JDialog {
 
     /**
      * Mostra um diálogo de Input em formato de ComboBox (Lista de opções).
-     * Exemplo: String cor = CardDialog.showComboInput(this, "Escolha", "Selecione uma cor:", new String[]{"Azul", "Vermelho"});
-     * 
-     * @return O item selecionado como String, ou null se o usuário cancelou.
      */
     public static String showComboInput(Component parent, String title, String message, Object[] options) {
-        CardDialog dialog = new CardDialog(parent, title, message, true, options);
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.INPUT, options);
         dialog.setVisible(true); // Trava a tela aqui até fechar
-        
+
         if (dialog.confirmed) {
             return dialog.inputValue;
         }
         return null;
+    }
+
+    /**
+     * Mostra um diálogo de Sucesso (apenas botão OK).
+     */
+    public static void showSuccess(Component parent, String title, String message) {
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.SUCCESS, null);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Mostra um diálogo de Erro (apenas botão OK).
+     */
+    public static void showError(Component parent, String title, String message) {
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.ERROR, null);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Mostra um diálogo de Alerta/Aviso (apenas botão OK).
+     */
+    public static void showAlert(Component parent, String title, String message) {
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.WARNING, null);
+        dialog.setVisible(true);
+    }
+
+    /**
+     * Mostra um diálogo de Informação (apenas botão OK).
+     */
+    public static void showInfo(Component parent, String title, String message) {
+        CardDialog dialog = new CardDialog(parent, title, message, DialogType.INFO, null);
+        dialog.setVisible(true);
     }
 }

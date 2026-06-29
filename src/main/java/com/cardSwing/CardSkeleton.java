@@ -14,7 +14,7 @@ public class CardSkeleton extends JPanel {
 
     private int offset = -300;
     private final Timer timer;
-    private int cardWidth = 280;
+    private int cardWidth = 420;
 
     public CardSkeleton() {
         setOpaque(false);
@@ -38,12 +38,12 @@ public class CardSkeleton extends JPanel {
 
     @Override
     public Dimension getPreferredSize() {
-        return new Dimension(cardWidth + 5, 180 + 5);
+        return new Dimension(cardWidth + 5, 260 + 5);
     }
     
     @Override
     public Dimension getMinimumSize() {
-        return new Dimension(200, 180);
+        return new Dimension(300, 260);
     }
 
     @Override
@@ -75,8 +75,9 @@ public class CardSkeleton extends JPanel {
         g2.setClip(bgRect);
 
         // === SHIMMER PAINT ===
-        Color base = new Color(241, 245, 249);
-        Color highlight = new Color(255, 255, 255, 220);
+        // Cores com maior contraste para a onda de brilho ficar mais evidente
+        Color base = new Color(226, 232, 240); // Slate 200 (fundo do esqueleto um pouco mais escuro)
+        Color highlight = new Color(255, 255, 255); // Branco puro (brilho passando)
         
         // Fallback for extreme widths preventing crash
         int endOffset = offset + 250;
@@ -89,21 +90,29 @@ public class CardSkeleton extends JPanel {
         );
         g2.setPaint(paint);
 
-        // Header
-        g2.fillRect(0, 0, w, 38);
+        // Header (A faixa vermelha de cima)
+        g2.fillRect(0, 0, w, 8);
 
-        // Title skeleton
-        g2.fillRoundRect(18, 55, 160, 20, 8, 8);
+        // Title skeleton (EAN e Switch)
+        g2.fillRoundRect(18, 25, 200, 22, 8, 8); // Title
+        g2.fillRoundRect(w - 60, 25, 40, 22, 11, 11); // Switch
+
+        // Subtitle skeleton (Descrição)
+        g2.fillRoundRect(18, 65, w - 50, 16, 6, 6);
         
-        // Subtitle skeleton
-        g2.fillRoundRect(18, 85, 100, 12, 6, 6);
+        // NCM block
+        g2.fillRoundRect(18, 100, 120, 24, 8, 8);
         
-        // Checkbox skeleton (square)
-        g2.fillRoundRect(18, 115, 14, 14, 4, 4);
-        g2.fillRoundRect(40, 115, 70, 12, 6, 6);
+        // Descrição Sugerida (2 linhas)
+        g2.fillRoundRect(18, 145, w - 50, 14, 6, 6);
+        g2.fillRoundRect(18, 165, w - 80, 14, 6, 6);
         
-        // Progress skeleton
-        g2.fillRoundRect(18, 145, w - 36, 8, 8, 8);
+        // NCM Sugerido
+        g2.fillRoundRect(18, 195, 150, 24, 8, 8);
+        
+        // Footer (Parametrizados / Não Parametrizados)
+        g2.fillRoundRect(18, 235, 120, 14, 6, 6);
+        g2.fillRoundRect(w - 150, 235, 130, 14, 6, 6);
 
         g2.dispose();
     }

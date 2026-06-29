@@ -7,17 +7,19 @@ import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 
 /**
- * Painel completo para exibir uma lista de cards com scroll.
- * Contém JScrollPane + WrapLayout internamente.
+ * Painel completo para exibir uma lista de cards com scroll. Contém JScrollPane
+ * + WrapLayout internamente.
  *
- * <p><b>PALETTE:</b> Arraste para o form. Use {@code setModel()} para
- * conectar dados, ou adicione CardPanels diretamente.</p>
+ * <p>
+ * <b>PALETTE:</b> Arraste para o form. Use {@code setModel()} para conectar
+ * dados, ou adicione CardPanels diretamente.</p>
  *
- * <p>Propriedades editáveis:</p>
+ * <p>
+ * Propriedades editáveis:</p>
  * <ul>
- *   <li><b>horizontalGap</b> — espaço horizontal entre cards</li>
- *   <li><b>verticalGap</b> — espaço vertical entre linhas</li>
- *   <li><b>scrollSpeed</b> — velocidade do scroll</li>
+ * <li><b>horizontalGap</b> — espaço horizontal entre cards</li>
+ * <li><b>verticalGap</b> — espaço vertical entre linhas</li>
+ * <li><b>scrollSpeed</b> — velocidade do scroll</li>
  * </ul>
  */
 public class CardListPanel extends JPanel implements Serializable {
@@ -43,7 +45,7 @@ public class CardListPanel extends JPanel implements Serializable {
         setLayout(new BorderLayout());
         setBackground(new Color(245, 247, 250));
 
-        container = new JPanel();
+        container = new ScrollablePanel();
         updateLayout();
         container.setBorder(new EmptyBorder(15, 15, 15, 15));
         container.setBackground(new Color(245, 247, 250));
@@ -57,19 +59,29 @@ public class CardListPanel extends JPanel implements Serializable {
         searchField = new JTextField();
         searchField.setFont(new Font("Segoe UI", Font.PLAIN, 14));
         searchField.setBorder(BorderFactory.createCompoundBorder(
-            BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
-            BorderFactory.createEmptyBorder(6, 12, 6, 12)
+                BorderFactory.createLineBorder(new Color(203, 213, 225), 1, true),
+                BorderFactory.createEmptyBorder(6, 12, 6, 12)
         ));
-        
+
         searchDebounceTimer = new Timer(400, e -> {
-            if (onSearch != null) onSearch.accept(searchField.getText());
+            if (onSearch != null) {
+                onSearch.accept(searchField.getText());
+            }
         });
         searchDebounceTimer.setRepeats(false);
-        
+
         searchField.getDocument().addDocumentListener(new javax.swing.event.DocumentListener() {
-            public void insertUpdate(javax.swing.event.DocumentEvent e) { searchDebounceTimer.restart(); }
-            public void removeUpdate(javax.swing.event.DocumentEvent e) { searchDebounceTimer.restart(); }
-            public void changedUpdate(javax.swing.event.DocumentEvent e) { searchDebounceTimer.restart(); }
+            public void insertUpdate(javax.swing.event.DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
+
+            public void removeUpdate(javax.swing.event.DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
+
+            public void changedUpdate(javax.swing.event.DocumentEvent e) {
+                searchDebounceTimer.restart();
+            }
         });
 
         searchPanel = new JPanel(new BorderLayout());
@@ -82,7 +94,9 @@ public class CardListPanel extends JPanel implements Serializable {
         vbar.addAdjustmentListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 if (vbar.getValue() + vbar.getVisibleAmount() >= vbar.getMaximum() - 20) {
-                    if (onScrollEnd != null) onScrollEnd.accept(null);
+                    if (onScrollEnd != null) {
+                        onScrollEnd.accept(null);
+                    }
                 }
             }
         });
@@ -90,26 +104,40 @@ public class CardListPanel extends JPanel implements Serializable {
         add(scrollPane, BorderLayout.CENTER);
     }
 
-    /** Retorna o container interno (para acesso avançado). */
-    public JPanel getContainer() { return container; }
+    /**
+     * Retorna o container interno (para acesso avançado).
+     */
+    public JPanel getContainer() {
+        return container;
+    }
 
     @Override
     public void setBackground(Color bg) {
         super.setBackground(bg);
-        if (container != null) container.setBackground(bg);
-        if (scrollPane != null && scrollPane.getViewport() != null) scrollPane.getViewport().setBackground(bg);
+        if (container != null) {
+            container.setBackground(bg);
+        }
+        if (scrollPane != null && scrollPane.getViewport() != null) {
+            scrollPane.getViewport().setBackground(bg);
+        }
     }
 
-    /** Adiciona um componente como card. */
+    /**
+     * Adiciona um componente como card.
+     */
     public void addCard(Component card) {
         container.add(card);
         container.revalidate();
         container.repaint();
     }
 
-    /** Adiciona uma lista de componentes como cards de uma vez. */
+    /**
+     * Adiciona uma lista de componentes como cards de uma vez.
+     */
     public void addCards(java.util.List<? extends Component> cards) {
-        if (cards == null || cards.isEmpty()) return;
+        if (cards == null || cards.isEmpty()) {
+            return;
+        }
         for (Component card : cards) {
             container.add(card);
         }
@@ -117,27 +145,85 @@ public class CardListPanel extends JPanel implements Serializable {
         container.repaint();
     }
 
-    /** Remove um card. */
+    /**
+     * Remove um card.
+     */
     public void removeCard(Component card) {
         container.remove(card);
         container.revalidate();
         container.repaint();
     }
 
-    /** Remove todos os cards. */
+    /**
+     * Remove todos os cards.
+     */
     public void clearCards() {
         container.removeAll();
         container.revalidate();
         container.repaint();
     }
 
-    /** Número de cards. */
-    public int getCardCount() { return container.getComponentCount(); }
+    /**
+     * Exibe ou remove esqueletos de carregamento de forma conveniente.
+     * Se já houver cards na tela, os esqueletos serão adicionados ao final 
+     * (ideal para paginação/scroll infinito). Ao parar de carregar, 
+     * apenas os esqueletos serão removidos, preservando os dados reais.
+     */
+    public void setLoading(boolean loading) {
+        if (loading) {
+            if (isLoading()) return; // Já está carregando
+
+            int qtdSkeletons = 3; // Padrão para quando já tem itens (Infinite Scroll)
+
+            // Se a tela estiver vazia, exibe 6 esqueletos grandes fixos 
+            // que preenchem perfeitamente sem gerar barra de rolagem
+            if (container.getComponentCount() == 0) {
+                qtdSkeletons = 6;
+            }
+
+            for (int i = 0; i < qtdSkeletons; i++) {
+                container.add(new CardSkeleton());
+            }
+            atualizar();
+        } else {
+            // Remove APENAS os componentes que são esqueletos
+            Component[] comps = container.getComponents();
+            boolean modificou = false;
+            for (Component c : comps) {
+                if (c instanceof CardSkeleton) {
+                    container.remove(c);
+                    modificou = true;
+                }
+            }
+            if (modificou) {
+                atualizar();
+            }
+        }
+    }
+
+    /**
+     * Verifica se o painel está exibindo animações de carregamento no momento.
+     */
+    public boolean isLoading() {
+        Component[] comps = container.getComponents();
+        if (comps.length > 0) {
+            return comps[comps.length - 1] instanceof CardSkeleton;
+        }
+        return false;
+    }
+
+    /**
+     * Número de cards.
+     */
+    public int getCardCount() {
+        return container.getComponentCount();
+    }
 
     // === PROPRIEDADES ===
-
     private void updateLayout() {
-        if (container == null) return;
+        if (container == null) {
+            return;
+        }
         if (columns > 0) {
             container.setLayout(new GridLayout(0, columns, horizontalGap, verticalGap));
         } else {
@@ -146,7 +232,10 @@ public class CardListPanel extends JPanel implements Serializable {
         container.revalidate();
     }
 
-    public int getColumns() { return columns; }
+    public int getColumns() {
+        return columns;
+    }
+
     public void setColumns(int columns) {
         int old = this.columns;
         this.columns = Math.max(0, columns);
@@ -154,7 +243,10 @@ public class CardListPanel extends JPanel implements Serializable {
         updateLayout();
     }
 
-    public int getHorizontalGap() { return horizontalGap; }
+    public int getHorizontalGap() {
+        return horizontalGap;
+    }
+
     public void setHorizontalGap(int horizontalGap) {
         int old = this.horizontalGap;
         this.horizontalGap = Math.max(0, horizontalGap);
@@ -162,7 +254,10 @@ public class CardListPanel extends JPanel implements Serializable {
         updateLayout();
     }
 
-    public int getVerticalGap() { return verticalGap; }
+    public int getVerticalGap() {
+        return verticalGap;
+    }
+
     public void setVerticalGap(int verticalGap) {
         int old = this.verticalGap;
         this.verticalGap = Math.max(0, verticalGap);
@@ -170,7 +265,10 @@ public class CardListPanel extends JPanel implements Serializable {
         updateLayout();
     }
 
-    public int getScrollSpeed() { return scrollSpeed; }
+    public int getScrollSpeed() {
+        return scrollSpeed;
+    }
+
     public void setScrollSpeed(int scrollSpeed) {
         int old = this.scrollSpeed;
         this.scrollSpeed = Math.max(1, scrollSpeed);
@@ -178,7 +276,10 @@ public class CardListPanel extends JPanel implements Serializable {
         firePropertyChange("scrollSpeed", old, this.scrollSpeed);
     }
 
-    public boolean isShowSearch() { return showSearch; }
+    public boolean isShowSearch() {
+        return showSearch;
+    }
+
     public void setShowSearch(boolean showSearch) {
         boolean old = this.showSearch;
         this.showSearch = showSearch;
@@ -200,5 +301,42 @@ public class CardListPanel extends JPanel implements Serializable {
         this.onScrollEnd = onScrollEnd;
     }
 
+    /**
+     * Atualiza o layout e repinta o painel e seu container interno. Útil após
+     * modificar componentes dinamicamente.
+     */
+    public void atualizar() {
+        if (container != null) {
+            container.revalidate();
+            container.repaint();
+        }
+        this.revalidate();
+        this.repaint();
+    }
+    private class ScrollablePanel extends JPanel implements Scrollable {
+        @Override
+        public Dimension getPreferredScrollableViewportSize() {
+            return getPreferredSize();
+        }
 
+        @Override
+        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return scrollSpeed;
+        }
+
+        @Override
+        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
+            return Math.max(scrollSpeed, visibleRect.height / 2);
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportWidth() {
+            return columns == 0; // True if responsive WrapLayout is enabled
+        }
+
+        @Override
+        public boolean getScrollableTracksViewportHeight() {
+            return false;
+        }
+    }
 }

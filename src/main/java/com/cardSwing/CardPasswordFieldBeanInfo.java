@@ -25,13 +25,15 @@ public class CardPasswordFieldBeanInfo extends SimpleBeanInfo {
             PropertyDescriptor borderColor = new PropertyDescriptor("borderColor", CardPasswordField.class);
             PropertyDescriptor focusColor = new PropertyDescriptor("focusColor", CardPasswordField.class);
             PropertyDescriptor placeholder = new PropertyDescriptor("placeholder", CardPasswordField.class);
+            PropertyDescriptor editable = new PropertyDescriptor("editable", CardPasswordField.class);
             
             radius.setValue("category", "CardPasswordField Configs");
             borderColor.setValue("category", "CardPasswordField Configs");
             focusColor.setValue("category", "CardPasswordField Configs");
             placeholder.setValue("category", "CardPasswordField Configs");
+            editable.setValue("category", "CardPasswordField Configs");
 
-            PropertyDescriptor[] props = {radius, borderColor, focusColor, placeholder};
+            PropertyDescriptor[] props = {radius, borderColor, focusColor, placeholder, editable};
             for (PropertyDescriptor pd : props) {
                 pd.setPreferred(true);
             }

@@ -13,6 +13,8 @@ public class CardListPanelBeanInfo extends SimpleBeanInfo {
     public BeanDescriptor getBeanDescriptor() {
         BeanDescriptor bd = new BeanDescriptor(CardListPanel.class);
         bd.setDisplayName("CardListPanel");
+        bd.setValue("isContainer", Boolean.TRUE);
+        bd.setValue("containerDelegate", "getContainer");
         return bd;
     }
     

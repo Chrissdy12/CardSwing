@@ -29,6 +29,7 @@ public class CardDatePicker extends CardTextField {
 
     public CardDatePicker() {
         super();
+        setPreferredSize(new Dimension(150, 38));
         setPlaceholder("");
         
         try {
@@ -47,7 +48,7 @@ public class CardDatePicker extends CardTextField {
         addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                if (isEnabled()) {
+                if (isEnabled() && isEditable()) {
                     // Clicou no ícone?
                     int iconX = getWidth() - 30;
                     if (e.getX() >= iconX) {

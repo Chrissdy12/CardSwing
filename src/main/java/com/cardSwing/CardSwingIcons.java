@@ -64,7 +64,7 @@ public class CardSwingIcons {
             g2.setColor(Color.WHITE);
             g2.fillRect(4, 4, 8, 2);
             g2.fillRect(4, 8, 6, 2);
-        } else if (name.equals("CardTitle") || name.equals("CardText") || name.equals("CardSubtitle")) {
+        } else if (name.equals("CardTitle") || name.equals("CardText") || name.equals("CardSubtitle") || name.equals("CardTextArea")) {
             g2.setColor(new Color(15, 23, 42));
             g2.setFont(new Font("Segoe UI", Font.BOLD, 12));
             g2.drawString(name.equals("CardTitle") ? "T" : "t", 4, 12);

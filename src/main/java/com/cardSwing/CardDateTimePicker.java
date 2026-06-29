@@ -26,6 +26,7 @@ public class CardDateTimePicker extends CardDatePicker {
 
     public CardDateTimePicker() {
         super();
+        setPreferredSize(new Dimension(200, 38));
         setPlaceholder("");
 
         try {

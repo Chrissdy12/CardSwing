@@ -41,7 +41,7 @@ public class CardComboBoxBeanInfo extends SimpleBeanInfo {
                 "borderColor", "chartColor", "chartType", "colors", "focusColor", "gridColor",
                 "headerColor", "headerTextColor", "items", "labels", "localDate", "localDateTime",
                 "onButtonClick", "onCardClick", "onScrollEnd", "onSearch", "placeholder", "radius",
-                "rowHoverColor", "showGrid", "titlePosition", "unselectedTextColor", "values"
+                "rowHoverColor", "showGrid", "titlePosition", "unselectedTextColor", "values", "editable"
             };
 
             for (String propName : customProps) {

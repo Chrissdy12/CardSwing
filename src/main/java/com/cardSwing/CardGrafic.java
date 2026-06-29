@@ -138,7 +138,7 @@ public class CardGrafic extends JPanel implements Serializable {
         }
 
         int maxValStrWidth = 0;
-        if (showLabels && (chartType == ChartType.HORIZONTAL_BAR_GRADIENT || chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP_COLORFUL)) {
+        if (showLabels && (chartType == ChartType.HORIZONTAL_BAR_GRADIENT || chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP_COLORFUL || chartType == ChartType.HORIZONTAL_BAR_MODERN_2)) {
             g2.setFont(FONT_BOLD_12);
             FontMetrics fmVal = g2.getFontMetrics();
             for (Double v : parsedValues) {
@@ -159,8 +159,10 @@ public class CardGrafic extends JPanel implements Serializable {
             drawPieChart(g2, width, height, topMargin, bottomMargin, parsedValues, parsedLabels);
         } else if (chartType == ChartType.HORIZONTAL_BAR) {
             drawHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
-        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN || chartType == ChartType.HORIZONTAL_BAR_MODERN_2) {
+        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN) {
             drawModernHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
+        } else if (chartType == ChartType.HORIZONTAL_BAR_MODERN_2) {
+            drawModern2HorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels);
         } else if (chartType == ChartType.HORIZONTAL_BAR_GRADIENT || chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL) {
             drawGradientHorizontalBarChart(g2, leftMargin, topMargin, chartWidth, chartHeight, maxVal, parsedValues, parsedLabels, chartType == ChartType.HORIZONTAL_BAR_GRADIENT_COLORFUL);
         } else if (chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP || chartType == ChartType.HORIZONTAL_BAR_LOLLIPOP_COLORFUL) {
@@ -286,44 +288,48 @@ public class CardGrafic extends JPanel implements Serializable {
         double step = (double) height / n;
         Color[] modernColors = { chartColor, new Color(16, 185, 129), new Color(245, 158, 11), new Color(139, 92, 246), new Color(239, 68, 68), new Color(14, 165, 233) };
 
+        int totalSegments = 20; // Barras segmentadas parecendo marcadores modernos
+        int segmentGap = 4;
+
         for (int i = 0; i < n; i++) {
             double v = vals.get(i);
-            int valWidth = (int) ((v / maxVal) * width);
+            int activeSegments = (int) Math.round((v / maxVal) * totalSegments);
             int py = y + (int) (i * step) + (int) (step / 2);
-            int barHeight = 24;
+            int barHeight = 16;
             int by = py - (barHeight / 2);
 
-            // Track com cor baseada na cor principal com alpha
             Color barCol = getColor(i, modernColors);
-            g2.setColor(new Color(barCol.getRed(), barCol.getGreen(), barCol.getBlue(), 40));
-            g2.fillRoundRect(x, by, width, barHeight, barHeight, barHeight);
 
-            // Barra principal
-            if (valWidth > 0) {
-                g2.setColor(barCol);
-                g2.fillRoundRect(x, by, valWidth, barHeight, barHeight, barHeight);
+            int segmentWidth = (width - (totalSegments - 1) * segmentGap) / totalSegments;
+            if (segmentWidth < 2) segmentWidth = 2;
+            
+            int totalDrawWidth = (segmentWidth * totalSegments) + (segmentGap * (totalSegments - 1));
+            // Centraliza levemente se o rounding der diferença no width final
+            int currX = x + (width - totalDrawWidth) / 2;
+
+            for (int s = 0; s < totalSegments; s++) {
+                if (s < activeSegments) {
+                    g2.setColor(barCol);
+                } else {
+                    g2.setColor(new Color(barCol.getRed(), barCol.getGreen(), barCol.getBlue(), 30)); // Segmento inativo bem clarinho
+                }
+                g2.fillRoundRect(currX, by, segmentWidth, barHeight, 6, 6); // Cantos arredondados
+                currX += segmentWidth + segmentGap;
             }
 
             g2.setFont(FONT_BOLD_12);
             FontMetrics fm = g2.getFontMetrics();
             
-            // Texto da label por cima da barra (ou fora se for muito pequena)
             if (showLabels && i < lbls.size()) {
                 String lbl = lbls.get(i);
-                if (valWidth > fm.stringWidth(lbl) + 15) {
-                    g2.setColor(Color.WHITE);
-                    g2.drawString(lbl, x + 10, by + (barHeight/2) + (fm.getAscent()/2) - 1);
-                } else {
-                    g2.setColor(textColor);
-                    g2.drawString(lbl, x + valWidth + 8, by + (barHeight/2) + (fm.getAscent()/2) - 1);
-                }
+                g2.setColor(textColor);
+                g2.drawString(lbl, x - fm.stringWidth(lbl) - 10, by + (barHeight/2) + (fm.getAscent()/2) - 1);
             }
 
-            // Valor alinhado à direita dentro do track
             if (showLabels) {
                 String valStr = (v == Math.floor(v)) ? String.valueOf((int) v) : String.valueOf(v);
-                g2.setColor(textColor);
-                g2.drawString(valStr, x + width - fm.stringWidth(valStr) - 10, by + (barHeight/2) + (fm.getAscent()/2) - 1);
+                g2.setColor(barCol);
+                g2.drawString(valStr, x + width + 10, by + (barHeight/2) + (fm.getAscent()/2) - 1);
             }
         }
     }

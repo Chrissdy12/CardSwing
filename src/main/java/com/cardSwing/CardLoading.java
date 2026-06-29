@@ -6,10 +6,13 @@ import java.awt.geom.Arc2D;
 import javax.swing.*;
 
 /**
- * Utilitário moderno para exibir um Loading flutuante (overlay) que bloqueia interações 
+ * Utilitário moderno para exibir um Loading flutuante (overlay) que bloqueia
+ * interações
  * sem congelar as animações da interface.
  * 
- * <p>Para tarefas pesadas, use sempre os métodos <code>execute(...)</code>.</p>
+ * <p>
+ * Para tarefas pesadas, use sempre os métodos <code>execute(...)</code>.
+ * </p>
  */
 public class CardLoading extends JDialog {
 
@@ -24,23 +27,27 @@ public class CardLoading extends JDialog {
         super(parent);
         this.parentWindow = parent;
         this.message = message;
-        
-        setModal(false); // Importante: Modal=false permite que a animação continue caso a EDT não seja brutalmente travada
+
+        setModal(false); // Importante: Modal=false permite que a animação continue caso a EDT não seja
+                         // brutalmente travada
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 100)); // Fundo escuro semi-transparente
         setAlwaysOnTop(true);
-        
+
         if (parent != null) {
-            setBounds(parent.getBounds());
+            updateBounds();
             // Se o usuário mover/redimensionar a tela, o loading acompanha!
             moveListener = new ComponentAdapter() {
                 @Override
                 public void componentMoved(ComponentEvent e) {
-                    if (isVisible()) setBounds(parent.getBounds());
+                    if (isVisible())
+                        updateBounds();
                 }
+
                 @Override
                 public void componentResized(ComponentEvent e) {
-                    if (isVisible()) setBounds(parent.getBounds());
+                    if (isVisible())
+                        updateBounds();
                 }
             };
             parent.addComponentListener(moveListener);
@@ -50,9 +57,12 @@ public class CardLoading extends JDialog {
         }
 
         // Consome eventos de mouse para evitar cliques na janela de trás
-        addMouseListener(new MouseAdapter() {});
-        addMouseMotionListener(new MouseAdapter() {});
-        addKeyListener(new KeyAdapter() {});
+        addMouseListener(new MouseAdapter() {
+        });
+        addMouseMotionListener(new MouseAdapter() {
+        });
+        addKeyListener(new KeyAdapter() {
+        });
         setFocusTraversalKeysEnabled(false);
 
         JPanel panel = new JPanel() {
@@ -62,8 +72,14 @@ public class CardLoading extends JDialog {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 
-                // Dimensões do quadrado branco
-                int boxW = 200;
+                // Prepara o texto para calcular a largura necessária do box
+                String text = message != null ? message : "Carregando...";
+                g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
+                FontMetrics fm = g2.getFontMetrics();
+                int textWidth = fm.stringWidth(text);
+
+                // Dimensões do quadrado branco, ajustando-se ao tamanho do texto (mínimo de 200px)
+                int boxW = Math.max(200, textWidth + 60);
                 int boxH = 160;
                 int bx = (getWidth() - boxW) / 2;
                 int by = (getHeight() - boxH) / 2;
@@ -82,22 +98,23 @@ public class CardLoading extends JDialog {
                 int spinY = by + 30;
 
                 g2.setStroke(new BasicStroke(6f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                
+
                 // Trilha de Fundo do Spinner
                 g2.setColor(new Color(226, 232, 240));
                 g2.drawArc(spinX, spinY, spinSize, spinSize, 0, 360);
 
-                // Arco Animado (Girando)
+                // Arco Animado (Girando de forma suave e independente de frame drops)
+                long time = System.currentTimeMillis();
+                double computedAngle = -((time % 1200) / 1200.0 * 360.0);
+                // Efeito de "respiração" no tamanho do arco (sweep) para ficar mais moderno
+                double sweepAngle = 80 + (Math.sin(time / 250.0) + 1) / 2.0 * 140;
+
                 g2.setColor(new Color(59, 130, 246)); // Azul vibrante
-                g2.draw(new Arc2D.Double(spinX, spinY, spinSize, spinSize, angle, 120, Arc2D.OPEN));
+                g2.draw(new Arc2D.Double(spinX, spinY, spinSize, spinSize, computedAngle, sweepAngle, Arc2D.OPEN));
 
                 // Texto Embaixo do Spinner
                 g2.setColor(new Color(71, 85, 105)); // Texto dark
-                g2.setFont(new Font("Segoe UI", Font.BOLD, 14));
-                FontMetrics fm = g2.getFontMetrics();
-                
-                String text = message != null ? message : "Carregando...";
-                int txtX = bx + (boxW - fm.stringWidth(text)) / 2;
+                int txtX = bx + (boxW - textWidth) / 2;
                 int txtY = spinY + spinSize + 35 + fm.getAscent();
                 g2.drawString(text, txtX, txtY);
 
@@ -107,12 +124,26 @@ public class CardLoading extends JDialog {
         panel.setOpaque(false);
         setContentPane(panel);
 
-        // Timer de 60fps para animação extremamente fluida
+        // Timer de 60fps para animação
         timer = new Timer(16, e -> {
-            angle -= 8;
-            if (angle <= -360) angle = 0;
             panel.repaint();
         });
+    }
+
+    private void updateBounds() {
+        if (parentWindow != null) {
+            try {
+                Component target = parentWindow;
+                if (parentWindow instanceof RootPaneContainer) {
+                    target = ((RootPaneContainer) parentWindow).getContentPane();
+                }
+                Point p = target.getLocationOnScreen();
+                Dimension s = target.getSize();
+                setBounds(p.x, p.y, s.width, s.height);
+            } catch (Exception ex) {
+                setBounds(parentWindow.getBounds());
+            }
+        }
     }
 
     @Override
@@ -134,8 +165,10 @@ public class CardLoading extends JDialog {
     }
 
     private static Window getWindow(Component c) {
-        if (c == null) return null;
-        if (c instanceof Window) return (Window) c;
+        if (c == null)
+            return null;
+        if (c instanceof Window)
+            return (Window) c;
         return SwingUtilities.getWindowAncestor(c);
     }
 
@@ -160,13 +193,21 @@ public class CardLoading extends JDialog {
     }
 
     public static void stop() {
-        SwingUtilities.invokeLater(() -> {
+        if (SwingUtilities.isEventDispatchThread()) {
             if (currentLoader != null) {
                 currentLoader.setVisible(false);
                 currentLoader.dispose();
                 currentLoader = null;
             }
-        });
+        } else {
+            SwingUtilities.invokeLater(() -> {
+                if (currentLoader != null) {
+                    currentLoader.setVisible(false);
+                    currentLoader.dispose();
+                    currentLoader = null;
+                }
+            });
+        }
     }
 
     // =========================================================
@@ -175,7 +216,8 @@ public class CardLoading extends JDialog {
 
     /**
      * Tipo 1: Executa apenas a tarefa pesada em background (com texto padrão).
-     * @param parent Componente pai para prender o overlay.
+     * 
+     * @param parent         Componente pai para prender o overlay.
      * @param backgroundTask O processamento pesado a ser feito.
      */
     public static void execute(Component parent, Runnable backgroundTask) {
@@ -184,8 +226,9 @@ public class CardLoading extends JDialog {
 
     /**
      * Tipo 2: Executa com texto personalizado e a tarefa pesada.
-     * @param parent Componente pai para prender o overlay.
-     * @param message Texto customizado (ex: "Buscando dados...").
+     * 
+     * @param parent         Componente pai para prender o overlay.
+     * @param message        Texto customizado (ex: "Buscando dados...").
      * @param backgroundTask O processamento pesado a ser feito.
      */
     public static void execute(Component parent, String message, Runnable backgroundTask) {
@@ -193,22 +236,26 @@ public class CardLoading extends JDialog {
     }
 
     /**
-     * Tipo 3: Executa com texto, tarefa pesada E uma rotina ao finalizar (callback).
-     * @param parent Componente pai.
-     * @param message Mensagem (ex: "Salvando...").
+     * Tipo 3: Executa com texto, tarefa pesada E uma rotina ao finalizar
+     * (callback).
+     * 
+     * @param parent         Componente pai.
+     * @param message        Mensagem (ex: "Salvando...").
      * @param backgroundTask Tarefa pesada (banco de dados, download).
-     * @param onFinish Tarefa leve que roda na tela quando tudo acaba (ex: mostrar os dados na tabela).
+     * @param onFinish       Tarefa leve que roda na tela quando tudo acaba (ex:
+     *                       mostrar os dados na tabela).
      */
     public static void execute(Component parent, String message, Runnable backgroundTask, Runnable onFinish) {
         // Exibe de imediato na thread de UI
         show(parent, message);
-        
+
         // Dispara o trabalho pesado em outra thread para NUNCA travar a animação
         new Thread(() -> {
             try {
-                // Aguarda um pequeno instante (150ms) pra dar tempo da tela de loading renderizar na UI thread sem engasgos iniciais
-                Thread.sleep(150); 
-                
+                // Aguarda um pequeno instante (150ms) pra dar tempo da tela de loading
+                // renderizar na UI thread sem engasgos iniciais
+                Thread.sleep(150);
+
                 if (backgroundTask != null) {
                     backgroundTask.run();
                 }
@@ -216,7 +263,8 @@ public class CardLoading extends JDialog {
             } finally {
                 // Esconde a tela
                 stop();
-                // Roda o callback na Thread principal (já que ele provavelmente vai alterar Labels ou Tabelas)
+                // Roda o callback na Thread principal (já que ele provavelmente vai alterar
+                // Labels ou Tabelas)
                 if (onFinish != null) {
                     SwingUtilities.invokeLater(onFinish);
                 }

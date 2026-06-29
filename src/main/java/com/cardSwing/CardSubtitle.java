@@ -7,7 +7,9 @@ import javax.swing.*;
 /**
  * Subtítulo do Card — texto menor e cinza.
  *
- * <p><b>PALETTE:</b> Arraste para dentro de um CardPanel.</p>
+ * <p>
+ * <b>PALETTE:</b> Arraste para dentro de um CardPanel.
+ * </p>
  */
 public class CardSubtitle extends JLabel implements Serializable {
 
@@ -25,10 +27,10 @@ public class CardSubtitle extends JLabel implements Serializable {
         setFont(new Font("Segoe UI", Font.PLAIN, fontSize));
         setForeground(subtitleColor);
         setAlignmentX(Component.LEFT_ALIGNMENT);
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, 24));
-        
+
         addComponentListener(new java.awt.event.ComponentAdapter() {
             int lastWidth = -1;
+
             public void componentResized(java.awt.event.ComponentEvent e) {
                 if (lineWrap && getWidth() != lastWidth) {
                     lastWidth = getWidth();
@@ -38,7 +40,10 @@ public class CardSubtitle extends JLabel implements Serializable {
         });
     }
 
-    public Color getSubtitleColor() { return subtitleColor; }
+    public Color getSubtitleColor() {
+        return subtitleColor;
+    }
+
     public void setSubtitleColor(Color subtitleColor) {
         Color old = this.subtitleColor;
         this.subtitleColor = subtitleColor;
@@ -46,7 +51,10 @@ public class CardSubtitle extends JLabel implements Serializable {
         firePropertyChange("subtitleColor", old, subtitleColor);
     }
 
-    public int getFontSize() { return fontSize; }
+    public int getFontSize() {
+        return fontSize;
+    }
+
     public void setFontSize(int fontSize) {
         int old = this.fontSize;
         this.fontSize = Math.max(8, fontSize);
@@ -56,13 +64,15 @@ public class CardSubtitle extends JLabel implements Serializable {
         } else {
             setFont(new Font("Segoe UI", Font.PLAIN, this.fontSize));
         }
-        setMaximumSize(new Dimension(Integer.MAX_VALUE, this.fontSize + 12));
         firePropertyChange("fontSize", old, this.fontSize);
     }
 
     private boolean lineWrap = false;
 
-    public boolean isLineWrap() { return lineWrap; }
+    public boolean isLineWrap() {
+        return lineWrap;
+    }
+
     public void setLineWrap(boolean lineWrap) {
         boolean old = this.lineWrap;
         this.lineWrap = lineWrap;
@@ -90,7 +100,8 @@ public class CardSubtitle extends JLabel implements Serializable {
         FontMetrics fm = g2.getFontMetrics();
         int y = fm.getAscent() + getInsets().top;
         int width = getWidth() - getInsets().left - getInsets().right;
-        if (width <= 0) width = 10;
+        if (width <= 0)
+            width = 10;
 
         String[] lines = getText().split("\n");
         for (String pLine : lines) {
@@ -119,13 +130,17 @@ public class CardSubtitle extends JLabel implements Serializable {
         if (!lineWrap || getText() == null || getText().toLowerCase().startsWith("<html>")) {
             return super.getPreferredSize();
         }
-        
+
         FontMetrics fm = getFontMetrics(getFont());
         int width = getWidth();
-        if (width <= 0) return super.getPreferredSize();
-        
+        if (width <= 0) {
+            Dimension pref = super.getPreferredSize();
+            return new Dimension(Math.min(pref.width, 250), pref.height);
+        }
+
         int w = width - getInsets().left - getInsets().right;
-        if (w <= 0) w = 10;
+        if (w <= 0)
+            w = 10;
 
         int linesCount = 0;
         String[] lines = getText().split("\n");

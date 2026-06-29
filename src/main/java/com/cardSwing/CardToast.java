@@ -18,7 +18,11 @@ public class CardToast extends JDialog {
 
         Color color;
         String iconText;
-        Type(Color c, String i) { this.color = c; this.iconText = i; }
+
+        Type(Color c, String i) {
+            this.color = c;
+            this.iconText = i;
+        }
     }
 
     private Timer slideTimer;
@@ -28,8 +32,10 @@ public class CardToast extends JDialog {
     private int currentY;
 
     private static Window getWindow(Component parentComponent) {
-        if (parentComponent == null) return null;
-        if (parentComponent instanceof Window) return (Window) parentComponent;
+        if (parentComponent == null)
+            return null;
+        if (parentComponent instanceof Window)
+            return (Window) parentComponent;
         return SwingUtilities.getWindowAncestor(parentComponent);
     }
 
@@ -46,20 +52,20 @@ public class CardToast extends JDialog {
             protected void paintComponent(Graphics g) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-                
+
                 // Sombra suave (simulação simples)
                 g2.setColor(new Color(0, 0, 0, 20));
                 g2.fillRoundRect(2, 2, getWidth() - 4, getHeight() - 4, 15, 15);
-                
+
                 // Fundo do Card
                 g2.setColor(Color.WHITE);
                 g2.fillRoundRect(0, 0, getWidth() - 4, getHeight() - 4, 15, 15);
-                
+
                 // Faixa lateral colorida
                 g2.setColor(type.color);
                 g2.fillRoundRect(0, 0, 10, getHeight() - 4, 15, 15);
                 g2.fillRect(5, 0, 5, getHeight() - 4); // conserta os cantos direitos
-                
+
                 g2.dispose();
             }
         };
@@ -75,10 +81,10 @@ public class CardToast extends JDialog {
                 g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
                 g2.setColor(type.color);
                 g2.fillOval(0, 0, 24, 24); // Bolinha de fundo
-                
+
                 g2.setColor(Color.WHITE);
                 g2.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
-                
+
                 if (type == Type.SUCCESS) {
                     g2.drawLine(7, 12, 11, 16);
                     g2.drawLine(11, 16, 17, 8);
@@ -94,7 +100,7 @@ public class CardToast extends JDialog {
                     g2.drawLine(12, 7, 12, 13); // Traço superior
                     g2.drawLine(12, 17, 12, 17); // Ponto inferior
                 }
-                
+
                 g2.dispose();
             }
         };
@@ -109,7 +115,7 @@ public class CardToast extends JDialog {
 
         setContentPane(content);
         pack();
-        
+
         setSize(Math.max(getWidth(), 250), getHeight() + 4);
 
         if (parentComponent != null) {
@@ -121,26 +127,30 @@ public class CardToast extends JDialog {
                 Point p = target.getLocationOnScreen();
                 Dimension s = target.getSize();
                 int x = p.x + s.width - getWidth() - 20;
-                targetY = p.y + s.height - getHeight() - 20;
-                currentY = targetY + 50; 
+                // Subindo um pouco mais o Toast (margem de 20 para 50)
+                targetY = p.y + s.height - getHeight() - 50;
+                currentY = targetY + 50;
                 setLocation(x, currentY);
             } catch (Exception ex) {
                 int x = parentComponent.getX() + parentComponent.getWidth() - getWidth() - 20;
-                targetY = parentComponent.getY() + parentComponent.getHeight() - getHeight() - 20;
-                currentY = targetY + 50; 
+                // Subindo um pouco mais o Toast (margem de 20 para 50)
+                targetY = parentComponent.getY() + parentComponent.getHeight() - getHeight() - 50;
+                currentY = targetY + 50;
                 setLocation(x, currentY);
             }
         } else {
             Dimension screen = Toolkit.getDefaultToolkit().getScreenSize();
-            targetY = screen.height - getHeight() - 50;
+            // Subindo um pouco mais o Toast (margem de 50 para 70)
+            targetY = screen.height - getHeight() - 70;
             currentY = targetY + 50;
             setLocation(screen.width - getWidth() - 20, currentY);
         }
-        
+
         try {
             setOpacity(0.0f);
-        } catch (Exception e) {} // Ignora se o SO não suportar
-        
+        } catch (Exception e) {
+        } // Ignora se o SO não suportar
+
         setVisible(true);
         animateIn();
     }
@@ -151,7 +161,7 @@ public class CardToast extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 boolean doneY = true;
                 boolean doneOp = true;
-                
+
                 if (currentY > targetY) {
                     currentY -= 3;
                     setLocation(getX(), currentY);
@@ -159,11 +169,15 @@ public class CardToast extends JDialog {
                 }
                 if (opacity < 1.0f) {
                     opacity += 0.05f;
-                    if (opacity > 1.0f) opacity = 1.0f;
-                    try { setOpacity(opacity); } catch(Exception ex) {}
+                    if (opacity > 1.0f)
+                        opacity = 1.0f;
+                    try {
+                        setOpacity(opacity);
+                    } catch (Exception ex) {
+                    }
                     doneOp = false;
                 }
-                
+
                 if (doneY && doneOp) {
                     slideTimer.stop();
                     startWait();
@@ -190,8 +204,12 @@ public class CardToast extends JDialog {
             public void actionPerformed(ActionEvent e) {
                 if (opacity > 0.0f) {
                     opacity -= 0.05f;
-                    if (opacity < 0.0f) opacity = 0.0f;
-                    try { setOpacity(opacity); } catch(Exception ex) {}
+                    if (opacity < 0.0f)
+                        opacity = 0.0f;
+                    try {
+                        setOpacity(opacity);
+                    } catch (Exception ex) {
+                    }
                 } else {
                     fadeTimer.stop();
                     dispose();
@@ -205,12 +223,15 @@ public class CardToast extends JDialog {
     public static void showSuccess(Component parent, String message) {
         new CardToast(parent, message, Type.SUCCESS);
     }
+
     public static void showError(Component parent, String message) {
         new CardToast(parent, message, Type.ERROR);
     }
+
     public static void showInfo(Component parent, String message) {
         new CardToast(parent, message, Type.INFO);
     }
+
     public static void showWarning(Component parent, String message) {
         new CardToast(parent, message, Type.WARNING);
     }

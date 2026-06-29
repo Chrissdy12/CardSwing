@@ -88,11 +88,35 @@ public class CardPanel extends JPanel implements Serializable {
 
             @Override
             public void mousePressed(MouseEvent e) {
+                clickPoint = e.getPoint();
                 if (clickable) {
-                    clickPoint = e.getPoint();
                     rippleRadius = 10f;
                     rippleAlpha = 0.5f;
                     rippleTimer.start();
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent e) {
+                if (clickPoint != null) {
+                    double dist = e.getPoint().distance(clickPoint);
+                    // O Java Swing não dispara mouseClicked se o mouse mover 1 pixel sequer.
+                    // Adicionamos uma tolerância de 15 pixels para corrigir a "falha" no clique.
+                    if (dist > 0 && dist < 15) {
+                        MouseEvent clickEvent = new MouseEvent(
+                                CardPanel.this,
+                                MouseEvent.MOUSE_CLICKED,
+                                System.currentTimeMillis(),
+                                e.getModifiers(),
+                                e.getX(),
+                                e.getY(),
+                                1,
+                                false
+                        );
+                        for (java.awt.event.MouseListener ml : getMouseListeners()) {
+                            ml.mouseClicked(clickEvent);
+                        }
+                    }
                 }
             }
 
@@ -197,15 +221,17 @@ public class CardPanel extends JPanel implements Serializable {
                     int maxIconSize = 24; // Tamanho máximo ideal para o header
                     int iconW = titleIcon.getIconWidth();
                     int iconH = titleIcon.getIconHeight();
-                    
+
                     if (iconW > 0 && iconH > 0) {
-                        double scale = Math.min(1.0, Math.min((double) maxIconSize / iconW, (double) maxIconSize / iconH));
+                        double scale = Math.min(1.0,
+                                Math.min((double) maxIconSize / iconW, (double) maxIconSize / iconH));
                         int drawW = (int) (iconW * scale);
                         int drawH = (int) (iconH * scale);
                         int drawY = (headerHeight - drawH) / 2;
-                        
+
                         if (titleIcon instanceof ImageIcon) {
-                            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+                            g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
+                                    RenderingHints.VALUE_INTERPOLATION_BILINEAR);
                             Image img = ((ImageIcon) titleIcon).getImage();
                             g2.drawImage(img, textX, drawY, drawW, drawH, null);
                         } else {
@@ -401,5 +427,15 @@ public class CardPanel extends JPanel implements Serializable {
         else
             setCursor(Cursor.getDefaultCursor());
         firePropertyChange("clickable", old, clickable);
+    }
+
+    /**
+     * Atualiza o layout e repinta o painel.
+     * Útil após adicionar ou remover componentes dinamicamente,
+     * evitando chamadas manuais a revalidate() e repaint().
+     */
+    public void atualizar() {
+        this.revalidate();
+        this.repaint();
     }
 }
