@@ -32,7 +32,7 @@ public class CardLoading extends JDialog {
                          // brutalmente travada
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 100)); // Fundo escuro semi-transparente
-        setAlwaysOnTop(true);
+        // setAlwaysOnTop(true); // Removido: Fazia com que o loading ficasse sobre outros apps e ignorasse a minimização
 
         if (parent != null) {
             updateBounds();

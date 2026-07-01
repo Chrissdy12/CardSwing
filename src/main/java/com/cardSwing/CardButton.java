@@ -54,7 +54,26 @@ public class CardButton extends JButton implements Serializable {
     }
 
     private void setup() {
-        setUI(new javax.swing.plaf.basic.BasicButtonUI());
+        setUI(new javax.swing.plaf.basic.BasicButtonUI() {
+            @Override
+            protected void paintText(Graphics g, JComponent c, Rectangle textRect, String text) {
+                AbstractButton b = (AbstractButton) c;
+                ButtonModel model = b.getModel();
+                FontMetrics fm = g.getFontMetrics();
+                int mnemonicIndex = b.getDisplayedMnemonicIndex();
+
+                if (model.isEnabled()) {
+                    g.setColor(b.getForeground());
+                } else {
+                    // Cor legível para texto de botão desabilitado
+                    g.setColor(new Color(130, 130, 130)); 
+                }
+                
+                // Usa renderização de texto simples, sem o efeito entalhado que atrapalha a leitura
+                javax.swing.plaf.basic.BasicGraphicsUtils.drawStringUnderlineCharAt(g, text, mnemonicIndex,
+                        textRect.x, textRect.y + fm.getAscent());
+            }
+        });
         setFont(new Font("Segoe UI", Font.BOLD, 12));
         setForeground(textColor);
         setOpaque(false);
@@ -98,10 +117,11 @@ public class CardButton extends JButton implements Serializable {
 
         boolean isPressed = getModel().isPressed();
         boolean isHover = getModel().isRollover();
+        boolean isEnabled = isEnabled();
 
         // 1. Sombra 3D (Drop Shadow)
-        // Quando o botão não está pressionado, mostramos a sombra embaixo
-        if (!isPressed) {
+        // Quando o botão não está pressionado e está habilitado, mostramos a sombra embaixo
+        if (!isPressed && isEnabled) {
             g2.setColor(new Color(0, 0, 0, 25));
             g2.fillRoundRect(0, 2, w, h, r, r);
             g2.setColor(new Color(0, 0, 0, 12));
@@ -109,25 +129,37 @@ public class CardButton extends JButton implements Serializable {
         }
 
         // 2. Cores e Gradiente Sutil (Efeito Premium)
-        Color topColor = isPressed ? darker(buttonColor, 0.90f) : (isHover ? brighter(buttonColor, 1.15f) : brighter(buttonColor, 1.08f));
-        Color bottomColor = isPressed ? darker(buttonColor, 0.95f) : (isHover ? buttonColor : darker(buttonColor, 0.92f));
+        Color topColor;
+        Color bottomColor;
         
-        GradientPaint gp = isPressed 
+        if (!isEnabled) {
+            topColor = new Color(235, 235, 235);
+            bottomColor = new Color(225, 225, 225);
+        } else {
+            topColor = isPressed ? darker(buttonColor, 0.90f) : (isHover ? brighter(buttonColor, 1.15f) : brighter(buttonColor, 1.08f));
+            bottomColor = isPressed ? darker(buttonColor, 0.95f) : (isHover ? buttonColor : darker(buttonColor, 0.92f));
+        }
+        
+        GradientPaint gp = (isPressed && isEnabled) 
                 ? new GradientPaint(0, 0, bottomColor, 0, h, topColor)
                 : new GradientPaint(0, 0, topColor, 0, h, bottomColor);
         
-        int yOffset = isPressed ? 1 : 0; // Desce 1 pixel fisicamente ao clicar!
+        int yOffset = (isPressed && isEnabled) ? 1 : 0; // Desce 1 pixel fisicamente ao clicar!
         
         g2.setPaint(gp);
         g2.fillRoundRect(0, yOffset, w, h, r, r);
 
         // 3. Borda Externa Crisp (Para dar definição e contraste)
-        g2.setColor(darker(buttonColor, 0.7f));
+        if (!isEnabled) {
+            g2.setColor(new Color(200, 200, 200));
+        } else {
+            g2.setColor(darker(buttonColor, 0.7f));
+        }
         g2.setStroke(new BasicStroke(1f));
         g2.drawRoundRect(0, yOffset, w - 1, h - 1, r, r);
 
         // 4. Ripple Effect
-        if (rippleAlpha > 0f && clickPoint != null) {
+        if (isEnabled && rippleAlpha > 0f && clickPoint != null) {
             Shape oldClip = g2.getClip();
             g2.setClip(new java.awt.geom.RoundRectangle2D.Float(0, yOffset, w, h, r, r));
             g2.setColor(new Color(255, 255, 255, (int) Math.max(0, Math.min(255, rippleAlpha * 255))));
@@ -141,11 +173,11 @@ public class CardButton extends JButton implements Serializable {
         // 5. Renderização do Texto (Anti-aliasing e deslocamento do clique)
         Graphics2D gText = (Graphics2D) g;
         gText.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
-        if (isPressed) {
+        if (isPressed && isEnabled) {
             gText.translate(0, 1);
         }
         super.paintComponent(gText);
-        if (isPressed) {
+        if (isPressed && isEnabled) {
             gText.translate(0, -1); // Restaura o translate após pintar
         }
     }

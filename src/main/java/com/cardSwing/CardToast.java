@@ -44,7 +44,6 @@ public class CardToast extends JDialog {
         setModal(false);
         setUndecorated(true);
         setBackground(new Color(0, 0, 0, 0)); // transparent background
-        setAlwaysOnTop(true);
         setFocusableWindowState(false); // não rouba o foco quando aparece
 
         JPanel content = new JPanel() {
